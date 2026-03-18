@@ -1,0 +1,102 @@
+# =============================================================================
+# Vehicle Insurance Project - Master .gitignore
+# =============================================================================
+
+# ### System Files ###
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.nfs*
+
+# ### IDE and Editors ###
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history/
+
+# Other Editors
+.project
+.classpath
+.factorypath
+.settings/
+.springBeans
+.sts4-cache
+.apt_generated
+/nbproject/private/
+/nbbuild/
+/nbdist/
+/.nb-gradle/
+
+# ### Build Artifacts ###
+# Backend (WillowShield)
+WillowShield/target/
+WillowShield/build/
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# Frontend (Angular)
+frontend/dist/
+frontend/tmp/
+frontend/out-tsc/
+frontend/bazel-out/
+frontend/.angular/cache
+
+# ### Dependencies and Cache ###
+frontend/node_modules/
+WillowShield/.mvn/wrapper/maven-wrapper.jar
+.sass-cache/
+/typings/
+
+# ### Sensitive Files ###
+.env
+WillowShield/.env
+frontend/.env
+*.jks
+*.p12
+*.key
+secrets.*
+
+# ### Logs and Test Reports ###
+# General logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Project specific backend logs
+WillowShield/*_log.txt
+WillowShield/build_log.txt
+WillowShield/compile_log.txt
+WillowShield/final_build_log.txt
+WillowShield/final_compile_log.txt
+WillowShield/maven_log.txt
+WillowShield/test_results.log
+
+# Project specific frontend logs/outputs
+frontend/build_error.log
+frontend/build_error.txt
+frontend/build_error_v2.log
+frontend/build_final.log
+frontend/core_tests_output.txt
+frontend/test_output.txt
+frontend/test_output_headless.txt
+frontend/test_final_report.log
+frontend/verification_output.txt
+frontend/final_check_*.log
+frontend/final_verification.log
+
+# ### Local Assets and Screenshots ###
+WillowShield/uploads/
+frontend/__screenshots__/
+frontend/coverage/
