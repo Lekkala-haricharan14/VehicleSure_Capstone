@@ -90,6 +90,16 @@ frontend/refactor_imports*.py
 frontend/test-debug.spec.ts
 frontend/__screenshots__/
 frontend/coverage/
+frontend/test_output.txt
+frontend/test_output_headless.txt
+frontend/test_final_report.log
+frontend/test_output_headless.txt
+frontend/test_output.txt
+frontend/refactor_imports_v2.py
+frontend/refactor_imports_v2.py
+frontend/refactor_imports.py
+frontend/final_check_output.txt
+frontend/verification_output.txt
 
 # Misc Unnecessary Files
 WillowShield/REPOSITORY_SUMMARY.md
