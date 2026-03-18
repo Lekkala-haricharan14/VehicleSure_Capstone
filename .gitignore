@@ -84,19 +84,18 @@ WillowShield/maven_log.txt
 WillowShield/test_results.log
 
 # Project specific frontend logs/outputs
-frontend/build_error.log
-frontend/build_error.txt
-frontend/build_error_v2.log
-frontend/build_final.log
-frontend/core_tests_output.txt
-frontend/test_output.txt
-frontend/test_output_headless.txt
-frontend/test_final_report.log
-frontend/verification_output.txt
-frontend/final_check_*.log
-frontend/final_verification.log
-
-# ### Local Assets and Screenshots ###
-WillowShield/uploads/
+frontend/*.log
+frontend/*.txt
+frontend/refactor_imports*.py
+frontend/test-debug.spec.ts
 frontend/__screenshots__/
 frontend/coverage/
+
+# Misc Unnecessary Files
+WillowShield/REPOSITORY_SUMMARY.md
+WillowShield/build_log.txt
+WillowShield/compile_log.txt
+WillowShield/final_build_log.txt
+WillowShield/final_compile_log.txt
+WillowShield/maven_log.txt
+WillowShield/test_results.log
