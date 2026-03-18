@@ -1,0 +1,288 @@
+<div class="p-8 max-w-7xl mx-auto space-y-10">
+
+    <!-- Active Policies Grid -->
+    <div class="space-y-6">
+        <h2 class="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">Your Active Policies</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div *ngFor="let p of policies()"
+                class="group bg-white rounded-[2.5rem] border border-slate-100 p-8 hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-500 relative overflow-hidden">
+                <!-- Status Badge -->
+                <div class="absolute top-6 right-8">
+                    <span
+                        class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-600 border border-emerald-100">
+                        {{ p.status }}
+                    </span>
+                </div>
+
+                <!-- Policy Logo/Icon -->
+                <div
+                    class="w-14 h-14 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 mb-6 group-hover:scale-110 transition-transform duration-500">
+                    <span class="material-icons text-3xl">verified_user</span>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <div class="text-[10px] font-black text-indigo-500 uppercase tracking-widest leading-none mb-2">
+                            Policy Number</div>
+                        <h3 class="text-2xl font-black text-slate-900 tracking-tight">{{ p.policyNumber }}</h3>
+                        <p class="text-sm text-slate-500 font-bold mt-1">{{ p.planName }}</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 pt-4 border-t border-slate-50">
+                        <div>
+                            <div class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Vehicle Reg
+                            </div>
+                            <div class="text-xs font-black text-slate-900 uppercase">{{ p.vehicleRegistrationNumber }}
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Expires On
+                            </div>
+                            <div class="text-xs font-black text-slate-900">{{ p.endDate | date:'MMM d, y' }}</div>
+                        </div>
+                    </div>
+
+                    <button (click)="onFileClaim(p)"
+                        class="w-full bg-indigo-600 text-white font-black py-4 rounded-2xl hover:bg-slate-900 transition-all duration-300 shadow-xl shadow-indigo-600/10 flex items-center justify-center gap-2 group/btn">
+                        File a Claim
+                        <span
+                            class="material-icons text-lg group-hover/btn:translate-x-1 transition-transform">arrow_forward</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Existing Claims List -->
+    <div *ngIf="myClaims().length > 0" class="space-y-6 pt-6">
+        <h2 class="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">Claim History</h2>
+        <div class="bg-white rounded-[2.5rem] border border-slate-100 overflow-hidden">
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="border-b border-slate-50">
+                        <th class="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Claim
+                            Number</th>
+                        <th class="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Type</th>
+                        <th class="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Policy
+                        </th>
+                        <th class="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Status
+                        </th>
+                        <th class="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Rejection
+                            Reason
+                        </th>
+                        <th class="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Approved
+                            Amount</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-50">
+                    <tr *ngFor="let c of myClaims()" class="hover:bg-slate-50 transition-colors">
+                        <td class="px-8 py-6 font-black text-slate-900 text-sm">{{ c.claimNumber }}</td>
+                        <td class="px-8 py-6">
+                            <span
+                                class="text-[10px] font-black text-indigo-600 uppercase tracking-widest bg-indigo-50 px-2 py-1 rounded-md">{{
+                                c.claimType }}</span>
+                        </td>
+                        <td class="px-8 py-6 text-sm text-slate-500 font-medium">{{ c.policyNumber }}</td>
+                        <td class="px-8 py-6">
+                            <span
+                                [class]="getStatusClass(c.status) + ' px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider'">
+                                {{ c.status }}
+                            </span>
+                        </td>
+                        <td class="px-8 py-6 text-sm text-rose-600 max-w-[200px] truncate"
+                            [title]="c.rejectionReason || ''">
+                            {{ c.rejectionReason || '-' }}
+                        </td>
+                        <td class="px-8 py-6 font-black text-slate-900 text-sm">
+                            {{ c.approvedAmount > 0 ? ('₹' + c.approvedAmount.toLocaleString()) : 'Pending Analysis' }}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Loading/Error States -->
+    <div *ngIf="isLoading()" class="flex flex-col items-center justify-center py-20 space-y-4">
+        <div class="w-12 h-12 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin"></div>
+        <p class="text-sm font-black text-slate-400 uppercase tracking-widest animate-pulse">Synchronizing Data...</p>
+    </div>
+
+    <div *ngIf="policies().length === 0 && !isLoading()"
+        class="bg-indigo-50 rounded-[2.5rem] p-12 text-center border-2 border-dashed border-indigo-100">
+        <div
+            class="w-20 h-20 bg-white rounded-3xl flex items-center justify-center text-indigo-600 mx-auto mb-6 shadow-xl shadow-indigo-500/10">
+            <span class="material-icons text-4xl">policy</span>
+        </div>
+        <h3 class="text-2xl font-black text-slate-900">No Active Policies found</h3>
+        <p class="text-slate-500 mt-2 font-medium max-w-md mx-auto">You need an active policy to file a claim. Browse
+            our plans and get covered today.</p>
+    </div>
+</div>
+
+<!-- Filing Modal -->
+<div *ngIf="showFilingModal()"
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+    <div
+        class="bg-white rounded-[3rem] w-full max-w-2xl overflow-hidden shadow-2xl relative animate-in fade-in zoom-in duration-300">
+        <!-- Close Button -->
+        <button (click)="closeModal()"
+            class="absolute top-8 right-8 w-12 h-12 rounded-full hover:bg-slate-50 flex items-center justify-center text-slate-400 hover:text-slate-900 transition-all">
+            <span class="material-icons">close</span>
+        </button>
+
+        <div class="p-12">
+            <div class="flex items-center gap-4 mb-8">
+                <div
+                    class="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-600/20">
+                    <span class="material-icons">add_moderator</span>
+                </div>
+                <div>
+                    <h2 class="text-2xl font-black text-slate-900">New Claim Request</h2>
+                    <p class="text-sm text-slate-500 font-medium">Policy: {{ selectedPolicy()?.policyNumber }}</p>
+                </div>
+            </div>
+
+            <form (submit)="submitClaim()" class="space-y-6">
+                <!-- Claim Type -->
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Claim
+                        Type</label>
+                    <div class="grid grid-cols-3 gap-3">
+                        <button *ngIf="!selectedPolicy()?.policyType?.toUpperCase().includes('THIRD')" type="button"
+                            (click)="claimType.set('DAMAGE'); updateLabels()"
+                            [class]="claimType() === 'DAMAGE' ? 'bg-indigo-600 text-white' : 'bg-slate-50 text-slate-600 hover:bg-slate-100'"
+                            class="py-3 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
+                            Damage
+                        </button>
+                        <button *ngIf="!selectedPolicy()?.policyType?.toUpperCase().includes('THIRD')" type="button"
+                            (click)="claimType.set('THEFT'); updateLabels()"
+                            [class]="claimType() === 'THEFT' ? 'bg-indigo-600 text-white' : 'bg-slate-50 text-slate-600 hover:bg-slate-100'"
+                            class="py-3 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
+                            Theft
+                        </button>
+                        <button type="button" (click)="claimType.set('THIRD_PARTY'); updateLabels()"
+                            [class]="claimType() === 'THIRD_PARTY' ? (selectedPolicy()?.policyType?.toUpperCase().includes('THIRD') ? 'col-span-3 bg-indigo-600 text-white' : 'bg-indigo-600 text-white') : 'bg-slate-50 text-slate-600 hover:bg-slate-100'"
+                            class="py-3 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
+                            Third Party
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div class="space-y-2">
+                    <label
+                        class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Description</label>
+                    <textarea [(ngModel)]="description" name="description" rows="3"
+                        placeholder="Tell us what happened..."
+                        class="w-full bg-slate-50 border-none rounded-[1.5rem] p-4 text-sm font-medium focus:ring-2 focus:ring-indigo-500 transition-all outline-none resize-none"></textarea>
+                </div>
+
+                <!-- Bank Details for Payout -->
+                <div class="bg-indigo-50/50 rounded-3xl p-6 space-y-4 border border-indigo-100/50">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="material-icons text-indigo-600 text-sm">account_balance</span>
+                        <h3 class="text-[10px] font-black text-indigo-900 uppercase tracking-widest leading-none">Settlement Bank Details</h3>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="space-y-2">
+                            <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest pl-1">Account Holder Name</label>
+                            <input type="text" [(ngModel)]="accountHolderName" name="accountHolderName" placeholder="As per bank records"
+                                class="w-full bg-white border-none rounded-xl p-3 text-xs font-bold focus:ring-2 focus:ring-indigo-500 transition-all outline-none">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-2">
+                                <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest pl-1">Bank Account Number</label>
+                                <input type="text" [(ngModel)]="bankAccountNumber" name="bankAccountNumber" placeholder="Account Number"
+                                    class="w-full bg-white border-none rounded-xl p-3 text-xs font-bold focus:ring-2 focus:ring-indigo-500 transition-all outline-none">
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest pl-1">IFSC Code</label>
+                                <input type="text" [(ngModel)]="ifscCode" name="ifscCode" placeholder="IFSC"
+                                    class="w-full bg-white border-none rounded-xl p-3 text-xs font-bold focus:ring-2 focus:ring-indigo-500 transition-all outline-none uppercase">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Document Uploads -->
+                <div class="space-y-4">
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Required
+                        Documents</label>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Doc 1 -->
+                        <div class="group relative">
+                            <input type="file" (change)="onFileChange($event, 1)" id="doc1" class="hidden">
+                            <label for="doc1"
+                                [class]="doc1() ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-slate-50 text-slate-600 border-transparent hover:border-indigo-200'"
+                                class="flex items-center gap-3 p-4 rounded-xl border border-dashed border-slate-200 cursor-pointer transition-all">
+                                <span class="material-icons text-xl">{{ doc1() ? 'check_circle' : 'cloud_upload'
+                                    }}</span>
+                                <div class="flex flex-col">
+                                    <span class="text-[10px] font-black uppercase tracking-widest leading-none">{{
+                                        doc1Label() }}</span>
+                                    <span class="text-[9px] text-slate-400 font-bold mt-1 truncate max-w-[150px]">{{
+                                        doc1() ? doc1()?.name : 'Upload File' }}</span>
+                                </div>
+                            </label>
+                        </div>
+
+                        <!-- Doc 2 -->
+                        <div class="group relative">
+                            <input type="file" (change)="onFileChange($event, 2)" id="doc2" class="hidden">
+                            <label for="doc2"
+                                [class]="doc2() ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-slate-50 text-slate-600 border-transparent hover:border-indigo-200'"
+                                class="flex items-center gap-3 p-4 rounded-xl border border-dashed border-slate-200 cursor-pointer transition-all">
+                                <span class="material-icons text-xl">{{ doc2() ? 'check_circle' : 'cloud_upload'
+                                    }}</span>
+                                <div class="flex flex-col">
+                                    <span class="text-[10px] font-black uppercase tracking-widest leading-none">{{
+                                        doc2Label() }}</span>
+                                    <span class="text-[9px] text-slate-400 font-bold mt-1 truncate max-w-[150px]">{{
+                                        doc2() ? doc2()?.name : 'Upload File' }}</span>
+                                </div>
+                            </label>
+                        </div>
+
+                        <!-- Doc 3 -->
+                        <div class="group relative md:col-span-2">
+                            <input type="file" (change)="onFileChange($event, 3)" id="doc3" class="hidden">
+                            <label for="doc3"
+                                [class]="doc3() ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-slate-50 text-slate-600 border-transparent hover:border-indigo-200'"
+                                class="flex items-center gap-3 p-4 rounded-xl border border-dashed border-slate-200 cursor-pointer transition-all">
+                                <span class="material-icons text-xl">{{ doc3() ? 'check_circle' : 'cloud_upload'
+                                    }}</span>
+                                <div class="flex flex-col">
+                                    <span class="text-[10px] font-black uppercase tracking-widest leading-none">{{
+                                        doc3Label() }}</span>
+                                    <span class="text-[9px] text-slate-400 font-bold mt-1 truncate max-w-[150px]">{{
+                                        doc3() ? doc3()?.name : 'Upload File' }}</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Error/Success Feedback -->
+                <div *ngIf="error()"
+                    class="bg-rose-50 text-rose-600 p-4 rounded-xl text-xs font-black uppercase tracking-widest flex items-center gap-2">
+                    <span class="material-icons text-lg">error_outline</span>
+                    {{ error() }}
+                </div>
+                <div *ngIf="successMessage()"
+                    class="bg-emerald-50 text-emerald-600 p-4 rounded-xl text-xs font-black uppercase tracking-widest flex items-center gap-2">
+                    <span class="material-icons text-lg">verified</span>
+                    {{ successMessage() }}
+                </div>
+
+                <button type="submit" [disabled]="isSubmitting() || successMessage()"
+                    class="w-full bg-slate-900 text-white font-black py-5 rounded-3xl hover:bg-indigo-600 transition-all duration-300 shadow-xl shadow-slate-900/10 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                    {{ isSubmitting() ? 'Submitting Request...' : 'Finalize & Submit Claim' }}
+                    <span *ngIf="!isSubmitting()" class="material-icons">send</span>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,139 @@
+<!-- Login Page — Tailwind v4 -->
+<div class="min-h-screen grid lg:grid-cols-2 font-body">
+
+    <!-- Left Brand Panel -->
+    <div class="hidden lg:flex flex-col justify-between bg-slate-900 p-12 relative overflow-hidden">
+        <div class="absolute inset-0 pointer-events-none">
+            <div
+                class="absolute w-80 h-80 bg-[radial-gradient(circle,#4f46e5,transparent)] -top-16 -right-16 opacity-30 animate-float-slow">
+            </div>
+            <div class="absolute w-56 h-56 bg-[radial-gradient(circle,#818cf8,transparent)] bottom-20 -left-10 opacity-20"
+                style="animation: floatSlow 14s ease-in-out infinite reverse;"></div>
+        </div>
+
+        <!-- Brand -->
+        <div class="relative z-10">
+            <div class="flex items-center gap-3 mb-14">
+                <div
+                    class="w-11 h-11 bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-xl flex items-center justify-center shadow-lg">
+                    <span class="material-icons text-white !text-2xl">shield</span>
+                </div>
+                <span class="font-display text-2xl font-black text-white">VehicleSure</span>
+            </div>
+            <h2 class="font-display text-4xl font-black text-white leading-tight mb-6 tracking-tight">
+                Welcome<br>back
+            </h2>
+            <p class="text-white/60 text-lg leading-relaxed max-w-xs">
+                Your vehicles are protected. Sign in to manage policies, file claims, and more.
+            </p>
+        </div>
+
+        <div class="relative z-10">
+            <p class="text-white/40 text-sm">Official WillowShield Insurance Portal.</p>
+        </div>
+    </div>
+
+    <!-- Right Form Panel -->
+    <div class="flex flex-col justify-center px-8 py-14 bg-slate-50 lg:bg-white">
+        <div class="w-full max-w-md mx-auto">
+
+            <!-- Mobile brand -->
+            <div class="flex items-center gap-2 mb-10 lg:hidden">
+                <div
+                    class="w-8 h-8 bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-lg flex items-center justify-center shadow-sm">
+                    <span class="material-icons text-white !text-base">shield</span>
+                </div>
+                <span class="font-display text-xl font-black text-slate-900">VehicleSure</span>
+            </div>
+
+            <h1 class="font-display text-3xl font-black text-slate-900 mb-2 tracking-tight">Sign in to your account</h1>
+            <p class="text-slate-500 text-sm mb-8">
+                Don't have an account?
+                <a routerLink="/register" class="text-indigo-600 font-semibold hover:underline">Create one free</a>
+            </p>
+
+            <!-- Error Alert -->
+            @if (errorMsg()) {
+            <div
+                class="flex items-center gap-3 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3.5 mb-6 text-sm animate-slide-up">
+                <span class="material-icons !text-xl flex-shrink-0">report_problem</span>
+                <span>{{ errorMsg() }}</span>
+            </div>
+            }
+
+            <!-- Form -->
+            <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-5">
+
+                <!-- Email -->
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">Email
+                        Address</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <span class="material-icons !text-xl text-slate-400">mail</span>
+                        </div>
+                        <input type="email" formControlName="email" placeholder="you@example.com"
+                            class="w-full pl-11 pr-4 py-3.5 border-[1.5px] rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-400 transition-all duration-200"
+                            [class.border-red-400]="email.invalid && email.touched"
+                            [class.border-slate-200]="!(email.invalid && email.touched)">
+                    </div>
+                    @if (email.invalid && email.touched) {
+                        @if (email.hasError('required')) {
+                            <p class="text-xs text-red-500 mt-1.5 font-medium">Email is required</p>
+                        }
+                        @if (email.hasError('email')) {
+                            <p class="text-xs text-red-500 mt-1.5 font-medium">Invalid email format</p>
+                        }
+                    }
+                </div>
+
+                <!-- Password -->
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="text-xs font-bold uppercase tracking-wider text-slate-600">Password</label>
+                        <!-- <a href="#" class="text-xs text-indigo-600 font-semibold hover:underline">Forgot password?</a> -->
+                    </div>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <span class="material-icons !text-xl text-slate-400">lock</span>
+                        </div>
+                        <input [type]="showPassword() ? 'text' : 'password'" formControlName="password"
+                            placeholder="Enter your password"
+                            class="w-full pl-11 pr-12 py-3.5 border-[1.5px] rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-400 transition-all duration-200"
+                            [class.border-red-400]="password.invalid && password.touched"
+                            [class.border-slate-200]="!(password.invalid && password.touched)">
+                        <button type="button" (click)="togglePassword()"
+                            class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 transition-colors text-sm font-semibold">
+                            {{ showPassword() ? 'Hide' : 'Show' }}
+                        </button>
+                    </div>
+                    @if (password.invalid && password.touched) {
+                        @if (password.hasError('required')) {
+                            <p class="text-xs text-red-500 mt-1.5 font-medium">Password is required</p>
+                        }
+                        @if (password.hasError('minlength')) {
+                            <p class="text-xs text-red-500 mt-1.5 font-medium">Password must be at least 6 characters</p>
+                        }
+                    }
+                </div>
+
+                <!-- Submit -->
+                <button type="submit" [disabled]="isLoading()"
+                    class="w-full bg-indigo-600 text-white font-bold py-4 rounded-xl hover:-translate-y-0.5 transition-all duration-200 shadow-lg shadow-indigo-500/30 disabled:opacity-60 disabled:cursor-not-allowed disabled:translate-y-0 mt-2 flex items-center justify-center gap-2">
+                    @if (isLoading()) {
+                    <span class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                    Signing in...
+                    } @else {
+                    <span>Sign In</span>
+                    <span class="material-icons !text-xl">arrow_forward</span>
+                    }
+                </button>
+            </form>
+
+            <p class="text-center text-sm text-slate-500 mt-8">
+                New to VehicleSure?
+                <a routerLink="/register" class="text-indigo-600 font-bold hover:underline">Create account</a>
+            </p>
+        </div>
+    </div>
+</div>

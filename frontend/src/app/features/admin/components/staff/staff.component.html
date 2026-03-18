@@ -1,0 +1,304 @@
+<div class="space-y-5">
+
+    @if (staffSuccess()) { <div
+        class="flex items-center gap-2 bg-green-50 border border-green-200 text-green-700 rounded-xl px-4 py-3 text-sm">
+        <span class="material-icons !text-[20px]">check_circle</span> {{ staffSuccess() }}
+    </div> }
+    @if (staffError()) { <div
+        class="flex items-center gap-2 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm">
+        <span class="material-icons !text-[20px]">report_problem</span> {{ staffError() }}
+    </div> }
+    @if (staffLoading()) {
+    <div class="flex items-center justify-center gap-3 py-20 text-slate-400">
+        <span
+            class="w-5 h-5 border-2 border-slate-300 border-t-indigo-600 rounded-full animate-spin inline-block"></span>Loading
+        staff...
+    </div>
+    } @else if (staff().length === 0) {
+    <div class="text-center py-24 bg-white rounded-2xl border border-slate-100">
+        <div class="flex justify-center mb-4">
+            <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center text-slate-400">
+                <span class="material-icons !text-[48px]">group</span>
+            </div>
+        </div>
+        <h3 class="font-display text-xl font-bold text-slate-800 mb-2">No staff members yet</h3>
+        <p class="text-slate-500 text-sm mb-6">Add your first underwriter or claims officer.</p>
+        <button (click)="openStaffModal()"
+            class="bg-indigo-600 text-white font-bold px-6 py-3 rounded-xl hover:bg-indigo-700 transition-colors">Add
+            First Staff Member</button>
+    </div>
+    } @else {
+
+    <!-- Actions Row -->
+    <div class="flex items-center justify-between mb-4">
+        <!-- Active / Inactive staff sub-tabs -->
+        <div class="flex gap-1 bg-slate-200 p-1 rounded-xl w-fit">
+            <button (click)="setStaffSubTab('active')"
+                class="flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-bold transition-all duration-200"
+                [class.bg-white]="staffSubTab() === 'active'" [class.shadow-sm]="staffSubTab() === 'active'"
+                [class.text-green-700]="staffSubTab() === 'active'" [class.text-slate-500]="staffSubTab() !== 'active'">
+                <span class="w-2 h-2 rounded-full bg-green-500 inline-block"></span>
+                Active
+                <span class="bg-green-100 text-green-700 text-[10px] font-black px-2 py-0.5 rounded-full">{{
+                    activeStaff().length }}</span>
+            </button>
+            <button (click)="setStaffSubTab('inactive')"
+                class="flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-bold transition-all duration-200"
+                [class.bg-white]="staffSubTab() === 'inactive'" [class.shadow-sm]="staffSubTab() === 'inactive'"
+                [class.text-slate-700]="staffSubTab() === 'inactive'"
+                [class.text-slate-500]="staffSubTab() !== 'inactive'">
+                <span class="w-2 h-2 rounded-full bg-slate-400 inline-block"></span>
+                Inactive
+                <span class="bg-slate-200 text-slate-500 text-[10px] font-black px-2 py-0.5 rounded-full">{{
+                    inactiveStaff().length }}</span>
+            </button>
+        </div>
+
+        <button (click)="openStaffModal()"
+            class="flex items-center gap-2 bg-indigo-600 text-white font-bold text-sm px-5 py-2.5 rounded-xl hover:bg-indigo-700 hover:-translate-y-0.5 transition-all shadow-lg shadow-indigo-500/30">
+            <span class="material-icons !text-base">add</span> Add Staff
+        </button>
+    </div>
+
+    <!-- ACTIVE STAFF grouped by role -->
+    @if (staffSubTab() === 'active') {
+    @if (activeStaff().length === 0) {
+    <div class="text-center py-20 bg-white rounded-2xl border border-slate-100">
+        <div class="flex justify-center mb-3">
+            <span class="material-icons !text-[32px]">people_outline</span>
+        </div>
+        <p class="text-slate-500 text-sm">No active staff yet.</p>
+    </div>
+    } @else {
+    <div class="space-y-8">
+        @for (group of activeStaffByRole(); track group.key) {
+        <div>
+            <div class="flex items-center gap-4 mb-4">
+                <div
+                    class="flex items-center gap-2.5 bg-white border border-slate-200 rounded-2xl px-4 py-3 shadow-sm flex-shrink-0">
+                    <div class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center">
+                        <span class="material-icons text-indigo-600 !text-lg">person</span>
+                    </div>
+                    <div>
+                        <div class="font-display text-sm font-black text-slate-900 leading-tight">{{
+                            group.label }}</div>
+                        <div class="text-[10px] text-slate-400 font-medium">{{ group.members.length }}
+                            member{{ group.members.length !== 1 ? 's' : '' }}</div>
+                    </div>
+                </div>
+                <div class="flex-1 h-px bg-slate-200"></div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                @for (s of group.members; track s.id) {
+                <div
+                    class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 flex items-start gap-4 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
+                    <div
+                        class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center text-lg font-black text-white flex-shrink-0">
+                        {{ s.username.charAt(0).toUpperCase() }}
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <div class="font-display font-black text-slate-900 text-sm leading-tight truncate">
+                            {{ s.username }}</div>
+                        <div class="text-xs text-slate-500 truncate mt-0.5">{{ s.email }}</div>
+                        <div class="text-xs text-slate-400 mt-0.5">{{ s.phoneNumber }}</div>
+                        <div class="flex items-center gap-2 mt-2">
+                            <span [class]="getRoleBadgeClass(s.role)">{{
+                                s.role.replace('_', ' ') }}</span>
+                            <span class="text-[10px] text-slate-400">Joined {{ s.createdAt | date }}</span>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-slate-100 flex justify-end">
+                            <button (click)="deactivateStaff(s.id, s.username)"
+                                class="text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 px-4 py-2 rounded-lg transition-colors flex items-center gap-1.5">
+                                <span class="material-icons !text-sm">block</span>
+                                Deactivate
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                }
+            </div>
+        </div>
+        }
+    </div>
+    }
+    }
+
+    <!-- INACTIVE STAFF grouped by role -->
+    @if (staffSubTab() === 'inactive') {
+    @if (inactiveStaff().length === 0) {
+    <div class="text-center py-20 bg-white rounded-2xl border border-slate-100">
+        <div class="flex justify-center mb-3">
+            <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center text-slate-400">
+                <span class="material-icons !text-[32px]">person_off</span>
+            </div>
+        </div>
+        <p class="text-slate-500 text-sm">No inactive staff - everyone is active!</p>
+    </div>
+    } @else {
+    <div class="space-y-8">
+        @for (group of inactiveStaffByRole(); track group.key) {
+        <div>
+            <div class="flex items-center gap-4 mb-4">
+                <div
+                    class="flex items-center gap-2.5 bg-white border border-slate-200 rounded-2xl px-4 py-3 shadow-sm flex-shrink-0 opacity-70">
+                    <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
+                        <span class="material-icons text-slate-400 !text-lg">person</span>
+                    </div>
+                    <div>
+                        <div class="font-display text-sm font-black text-slate-900 leading-tight">{{
+                            group.label }}</div>
+                        <div class="text-[10px] text-slate-400 font-medium">{{ group.members.length }}
+                            member{{ group.members.length !== 1 ? 's' : '' }}</div>
+                    </div>
+                </div>
+                <div class="flex-1 h-px bg-slate-200"></div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 opacity-70">
+                @for (s of group.members; track s.id) {
+                <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 flex items-start gap-4">
+                    <div
+                        class="w-12 h-12 rounded-xl bg-gradient-to-br from-slate-400 to-slate-600 flex items-center justify-center text-lg font-black text-white flex-shrink-0">
+                        {{ s.username.charAt(0).toUpperCase() }}
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <div class="font-display font-black text-slate-900 text-sm leading-tight truncate">
+                            {{ s.username }}</div>
+                        <div class="text-xs text-slate-500 truncate mt-0.5">{{ s.email }}</div>
+                        <div class="text-xs text-slate-400 mt-0.5">{{ s.phoneNumber }}</div>
+                        <div class="flex items-center gap-2 mt-2">
+                            <span [class]="getRoleBadgeClass(s.role)">{{
+                                s.role.replace('_', ' ') }}</span>
+                            <span class="text-[10px] text-slate-400">Joined {{ s.createdAt | date }}</span>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-slate-100 flex justify-end">
+                            <button (click)="activateStaff(s.id, s.username)"
+                                class="text-xs font-bold text-green-700 bg-green-100 hover:bg-green-200 px-4 py-2 rounded-lg transition-colors flex items-center gap-1.5">
+                                <span class="material-icons !text-sm">check_circle</span>
+                                Activate
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                }
+            </div>
+        </div>
+        }
+    </div>
+    }
+    }
+
+    }
+</div>
+
+<!-- STAFF MODAL -->
+@if (showStaffModal()) {
+<div class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-5 animate-fade-in"
+    (click)="closeStaffModal()">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg animate-slide-up" (click)="$event.stopPropagation()">
+        <div class="flex items-center justify-between px-7 py-5 border-b border-slate-100">
+            <h2 class="font-display text-xl font-black text-slate-900 flex items-center gap-2"><span
+                    class="material-icons !text-[24px]">person_add</span> Add Staff Member</h2>
+            <button (click)="closeStaffModal()"
+                class="w-9 h-9 bg-slate-100 hover:bg-slate-200 rounded-full flex items-center justify-center text-slate-500 transition-colors"><span
+                    class="material-icons">close</span></button>
+        </div>
+        <div class="px-7 py-6">
+            @if (staffError()) { <div
+                class="flex items-center gap-2 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm mb-5">
+                <span class="material-icons !text-[20px]">report_problem</span> {{ staffError() }}
+            </div> }
+            <form [formGroup]="staffForm" (ngSubmit)="submitStaff()" novalidate class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Full Name
+                            *</label>
+                        <input type="text" formControlName="username" placeholder="John Doe"
+                            class="w-full px-4 py-3 border-[1.5px] rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-indigo-100 transition-all border-slate-200">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Role
+                            *</label>
+                        <select formControlName="role"
+                            class="w-full px-4 py-3 border-[1.5px] border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-indigo-100 transition-all bg-white">
+                            <option value="UNDERWRITER">Underwriter</option>
+                            <option value="CLAIMS_OFFICER">Claims Officer</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Email
+                        *</label>
+                    <input type="email" formControlName="email" placeholder="john@example.com"
+                        class="w-full px-4 py-3 border-[1.5px] border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-indigo-100 transition-all">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Phone
+                            *</label>
+                        <input type="tel" formControlName="phoneNumber" placeholder="9876543210"
+                            class="w-full px-4 py-3 border-[1.5px] border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-indigo-100 transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Temp
+                            Password (Optional)</label>
+                        <input type="password" formControlName="password" placeholder="Min 8 chars"
+                            class="w-full px-4 py-3 border-[1.5px] border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-indigo-100 transition-all">
+                    </div>
+                </div>
+                <div class="pt-4">
+                    <button type="submit" [disabled]="staffSubmitting()"
+                        class="w-full bg-indigo-600 text-white font-black py-3.5 rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-500/20 flex items-center justify-center gap-2">
+                        @if (staffSubmitting()) {
+                        <span class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                        Creating...
+                        } @else {
+                        <span>Add Member</span>
+                        }
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+}
+
+<!-- DEACTIVATE STAFF MODAL -->
+@if (showDeactivateStaffModal()) {
+<div class="fixed top-0 left-0 w-full h-full bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-5">
+    <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full text-center">
+        <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <span class="material-icons text-red-600 !text-4xl animate-bounce">warning</span>
+        </div>
+        <h3 class="text-xl font-black text-slate-900 mb-2">Deactivate Staff?</h3>
+        <p class="text-slate-500 text-sm mb-8">Are you sure you want to deactivate <span
+                class="font-extrabold text-slate-800">{{pendingDeactivateStaffName()}}</span>? They will no longer be
+            able to log in.</p>
+        <div class="flex gap-4">
+            <button (click)="showDeactivateStaffModal.set(false)"
+                class="flex-1 px-4 py-3 rounded-xl border border-slate-200 text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors">Cancel</button>
+            <button (click)="confirmDeactivateStaff()"
+                class="flex-1 px-4 py-3 rounded-xl bg-red-600 text-white text-sm font-bold hover:bg-red-700 transition-colors">Deactivate</button>
+        </div>
+    </div>
+</div>
+}
+
+<!-- ACTIVATE STAFF MODAL -->
+@if (showActivateStaffModal()) {
+<div class="fixed top-0 left-0 w-full h-full bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-5">
+    <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full text-center">
+        <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <span class="material-icons text-green-600 !text-4xl">check_circle</span>
+        </div>
+        <h3 class="text-xl font-black text-slate-900 mb-2">Activate Staff?</h3>
+        <p class="text-slate-500 text-sm mb-8">Restore access for <span class="font-extrabold text-slate-800">{{
+                pendingActivateStaffName() }}</span>?</p>
+        <div class="flex gap-4">
+            <button (click)="showActivateStaffModal.set(false)"
+                class="flex-1 px-4 py-3 rounded-xl border border-slate-200 text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors">Cancel</button>
+            <button (click)="confirmActivateStaff()"
+                class="flex-1 px-4 py-3 rounded-xl bg-green-600 text-white text-sm font-bold hover:bg-green-700 transition-colors">Activate</button>
+        </div>
+    </div>
+</div>
+}

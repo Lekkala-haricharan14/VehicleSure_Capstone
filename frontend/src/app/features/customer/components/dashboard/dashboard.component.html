@@ -1,0 +1,218 @@
+<div class="max-w-5xl mx-auto">
+
+    <!-- Quick Actions Row (Acko style) -->
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-12">
+        <!-- Buy New Policy Action -->
+        <a routerLink="/buy"
+            class="group relative bg-white border border-slate-200 rounded-3xl p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden isolate">
+            <div
+                class="absolute inset-0 bg-gradient-to-br from-indigo-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity -z-10">
+            </div>
+            <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center mb-4">
+                <span class="material-icons !text-2xl">add_moderator</span>
+            </div>
+            <h3 class="font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">Buy Policy</h3>
+            <p class="text-xs text-slate-500 mt-1">Car, Bike, EV & more</p>
+        </a>
+
+        <!-- File a Claim Action -->
+        <a routerLink="/customer/claims"
+            class="group relative bg-white border border-slate-200 rounded-3xl p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden isolate">
+            <div
+                class="absolute inset-0 bg-gradient-to-br from-rose-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity -z-10">
+            </div>
+            <div class="w-12 h-12 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center mb-4">
+                <span class="material-icons !text-2xl">bolt</span>
+            </div>
+            <h3 class="font-bold text-slate-900 group-hover:text-rose-600 transition-colors">File Claim</h3>
+            <p class="text-xs text-slate-500 mt-1">Fast & cashless</p>
+        </a>
+
+        <!-- My Policies Action -->
+        <a routerLink="/customer/policies"
+            class="group relative bg-white border border-slate-200 rounded-3xl p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden isolate">
+            <div
+                class="absolute inset-0 bg-gradient-to-br from-emerald-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity -z-10">
+            </div>
+            <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mb-4">
+                <span class="material-icons !text-2xl">assignment</span>
+            </div>
+            <h3 class="font-bold text-slate-900 group-hover:text-emerald-600 transition-colors">My Policies</h3>
+            <p class="text-xs text-slate-500 mt-1">Download & renew</p>
+        </a>
+    </div>
+
+    <!-- Recent Applications -->
+    <div>
+        <h2 class="text-xl font-bold text-slate-900 mb-6">Recent Policy Requests</h2>
+
+        <div *ngIf="isLoading" class="text-center py-10 bg-white rounded-3xl border border-slate-200">
+            <div class="w-8 h-8 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mx-auto mb-3">
+            </div>
+            <p class="text-slate-500 text-sm">Loading applications...</p>
+        </div>
+
+        <div *ngIf="!isLoading && applications.length === 0"
+            class="text-center py-12 bg-white rounded-3xl border border-slate-200 border-dashed">
+            <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span class="material-icons text-slate-400 !text-4xl">folder_off</span>
+            </div>
+            <h3 class="font-bold text-slate-800 text-lg mb-1">No applications yet</h3>
+            <p class="text-slate-500 text-sm max-w-sm mx-auto">You haven't purchased any policies yet. Use the Quick
+                Actions above to get started.</p>
+        </div>
+
+        <div *ngIf="!isLoading && applications.length > 0"
+            class="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr
+                            class="bg-slate-50 border-b border-slate-200 text-slate-500 text-xs uppercase tracking-wider font-semibold">
+                            <th class="p-4 pl-6">Req ID</th>
+                            <th class="p-4">Vehicle</th>
+                            <th class="p-4">Plan Name</th>
+                            <th class="p-4">Date</th>
+                            <th class="p-4">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 text-sm">
+                        <tr *ngFor="let app of applications" class="hover:bg-slate-50/50 transition-colors">
+                            <td class="p-4 pl-6 font-medium text-slate-900">#{{ app.vehicleApplicationId }}</td>
+                            <td class="p-4 text-slate-600">
+                                <div class="font-semibold text-slate-800">{{ app.make }} {{ app.model }}</div>
+                                <div class="text-xs">{{ app.registrationNumber }}</div>
+                            </td>
+                            <td class="p-4 text-slate-600">
+                                <div class="font-medium">{{ app.planName || 'N/A' }}</div>
+                                <div class="flex items-center gap-1.5 mt-1">
+                                    <span *ngIf="app.policyType"
+                                        class="px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-600 text-[9px] font-bold uppercase border border-indigo-100">
+                                        {{ app.policyType }}
+                                    </span>
+                                    <span class="text-[10px] text-slate-400 font-bold uppercase">{{ app.tenureYears }}
+                                        Year Plan</span>
+                                </div>
+                            </td>
+                            <td class="p-4 text-slate-500 whitespace-nowrap">{{ app.createdAt | date:'mediumDate' }}
+                            </td>
+                            <td class="p-4">
+                                <div class="flex flex-col gap-1 items-start">
+                                    <span
+                                        class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-black border uppercase tracking-wider"
+                                        [class]="getStatusBadgeClass(app.status)">
+                                        <span class="w-1.5 h-1.5 rounded-full"
+                                            [class]="app.status === 'UNDER_REVIEW' ? 'bg-amber-500' : (app.status === 'APPROVED' ? 'bg-emerald-500' : (app.status === 'PAID' ? 'bg-indigo-500' : 'bg-rose-500'))"></span>
+                                        {{ app.status === 'UNDER_REVIEW' ? 'Under Review' : app.status }}
+                                    </span>
+
+                                    <!-- Action: Pay Now -->
+                                    <div *ngIf="app.status === 'APPROVED'" class="mt-2">
+                                        <button (click)="confirmPayment(app)"
+                                            class="inline-flex items-center px-3 py-1 bg-indigo-600 text-white text-[10px] font-bold rounded-lg hover:bg-indigo-700 transition-colors shadow-sm gap-1.5">
+                                            <span class="material-icons !text-xs">account_balance_wallet</span>
+                                            Pay Now ({{ app.calculatedPremium | currency:'INR':'symbol':'1.0-0' }})
+                                        </button>
+                                    </div>
+
+                                    <!-- Action: Downloads after payment -->
+                                    <div *ngIf="isPaid(app.status)" class="mt-2 text-[10px]">
+                                        <div class="flex items-center gap-1.5 text-emerald-600 font-bold mb-1">
+                                            <span class="material-icons text-emerald-600 !text-xs">check_circle</span>
+                                            Documents Ready
+                                        </div>
+                                        <div class="flex gap-1.5">
+                                            <button (click)="downloadPolicy(app.policyId)"
+                                                class="px-2 py-1 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors flex items-center gap-1">
+                                                <span class="material-icons !text-xs">download</span>
+                                                Policy
+                                            </button>
+                                            <button (click)="downloadInvoice(app.policyId)"
+                                                class="px-2 py-1 bg-indigo-50 text-indigo-700 border border-indigo-100 rounded-lg hover:bg-indigo-100 transition-colors flex items-center gap-1">
+                                                <span class="material-icons !text-xs">receipt</span>
+                                                Invoice
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==========================================
+     Custom Payment Confirmation Modal 
+     ========================================== -->
+<div *ngIf="showConfirmModal()"
+    class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-[2px] animate-fade-in"
+    (click)="cancelPaymentConfirm()">
+
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-white/20 animate-slide-up"
+        (click)="$event.stopPropagation()">
+
+        <div class="p-8 text-center">
+            <!-- Icon -->
+            <div
+                class="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-full mx-auto mb-6 flex items-center justify-center">
+                <span class="material-icons !text-4xl">account_balance_wallet</span>
+            </div>
+
+            <!-- Title & Description -->
+            <h3 class="text-xl font-black text-slate-900 mb-3 font-display">Confirm Payment</h3>
+            <p class="text-slate-500 text-sm leading-relaxed mb-8">
+                Confirm payment of <span class="font-bold text-slate-900">{{ selectedAppForPayment()?.calculatedPremium
+                    | currency:'INR':'symbol':'1.0-0' }}</span>
+                for your <span class="font-bold text-slate-900">{{ selectedAppForPayment()?.make }} {{
+                    selectedAppForPayment()?.model }}</span> insurance?
+                Your policy documents will be generated instantly.
+            </p>
+
+            <!-- Actions -->
+            <div class="flex gap-3">
+                <button (click)="cancelPaymentConfirm()"
+                    class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-xl transition-colors">
+                    Cancel
+                </button>
+                <button (click)="processPaymentConfirm()"
+                    class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-indigo-100 active:scale-95">
+                    Confirm & Pay
+                </button>
+            </div>
+
+            <!-- ==========================================
+     Success / Error Notifications 
+     ========================================== -->
+            <div *ngIf="paymentSuccess()"
+                class="fixed top-8 left-1/2 -translate-x-1/2 z-[100] w-full max-w-sm animate-slide-up-fade">
+                <div
+                    class="bg-emerald-600 text-white rounded-2xl shadow-2xl p-4 flex items-center gap-4 border border-emerald-500">
+                    <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <span class="material-icons text-white !text-2xl">check_circle</span>
+                    </div>
+                    <p class="text-sm font-bold">{{ paymentSuccess() }}</p>
+                    <button (click)="paymentSuccess.set(null)" class="ml-auto opacity-70 hover:opacity-100">
+                        <span class="material-icons !text-xl">close</span>
+                    </button>
+                </div>
+            </div>
+
+            <div *ngIf="paymentError()"
+                class="fixed top-8 left-1/2 -translate-x-1/2 z-[100] w-full max-w-sm animate-slide-up-fade">
+                <div
+                    class="bg-rose-600 text-white rounded-2xl shadow-2xl p-4 flex items-center gap-4 border border-rose-500">
+                    <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <span class="material-icons text-white !text-2xl">error</span>
+                    </div>
+                    <p class="text-sm font-bold">{{ paymentError() }}</p>
+                    <button (click)="paymentError.set(null)" class="ml-auto opacity-70 hover:opacity-100">
+                        <span class="material-icons !text-xl">close</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

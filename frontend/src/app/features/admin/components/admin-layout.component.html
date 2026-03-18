@@ -1,0 +1,98 @@
+<div class="min-h-screen bg-slate-50 flex flex-col">
+    <!-- NAVBAR -->
+    <header
+        class="h-20 bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm px-8 flex items-center justify-between">
+        <!-- Brand & Logo -->
+        <div class="flex items-center gap-10">
+            <div routerLink="/admin/dashboard" class="flex items-center gap-3 cursor-pointer group">
+                <div
+                    class="w-10 h-10 bg-gradient-to-br from-indigo-600 to-indigo-800 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-200 group-hover:scale-105 transition-transform duration-300">
+                    <span class="material-icons text-white !text-xl">shield</span>
+                </div>
+                <div>
+                    <h1 class="font-display text-lg font-black text-slate-900 leading-tight">VehicleSure</h1>
+                    <p class="text-[10px] text-indigo-600 font-bold uppercase tracking-[0.2em] leading-none">Admin
+                        Portal</p>
+                </div>
+            </div>
+
+            <!-- Primary Nav Links -->
+            <nav class="hidden h-full lg:flex items-center gap-1 ml-4">
+                <a routerLink="/admin/dashboard" routerLinkActive="text-indigo-600 after:w-full"
+                    class="relative px-5 py-2 text-sm font-bold text-slate-500 hover:text-slate-900 transition-colors after:absolute after:bottom-[-26px] after:left-0 after:h-1 after:bg-indigo-600 after:rounded-t-full after:transition-all after:duration-300 after:w-0">
+                    Dashboard
+                </a>
+                <a routerLink="/admin/staff" routerLinkActive="text-indigo-600 after:w-full"
+                    class="relative px-5 py-2 text-sm font-bold text-slate-500 hover:text-slate-900 transition-colors after:absolute after:bottom-[-26px] after:left-0 after:h-1 after:bg-indigo-600 after:rounded-t-full after:transition-all after:duration-300 after:w-0">
+                    Staff
+                </a>
+                <a routerLink="/admin/plans" routerLinkActive="text-indigo-600 after:w-full"
+                    class="relative px-5 py-2 text-sm font-bold text-slate-500 hover:text-slate-900 transition-colors after:absolute after:bottom-[-26px] after:left-0 after:h-1 after:bg-indigo-600 after:rounded-t-full after:transition-all after:duration-300 after:w-0">
+                    Plans
+                </a>
+                <a routerLink="/admin/applications" routerLinkActive="text-indigo-600 after:w-full"
+                    class="relative px-5 py-2 text-sm font-bold text-slate-500 hover:text-slate-900 transition-colors after:absolute after:bottom-[-26px] after:left-0 after:h-1 after:bg-indigo-600 after:rounded-t-full after:transition-all after:duration-300 after:w-0">
+                    Applications
+                </a>
+                <a routerLink="/admin/claims" routerLinkActive="text-indigo-600 after:w-full"
+                    class="relative px-5 py-2 text-sm font-bold text-slate-500 hover:text-slate-900 transition-colors after:absolute after:bottom-[-26px] after:left-0 after:h-1 after:bg-indigo-600 after:rounded-t-full after:transition-all after:duration-300 after:w-0">
+                    Claims
+                </a>
+                <a routerLink="/admin/payments" routerLinkActive="text-indigo-600 after:w-full"
+                    class="relative px-5 py-2 text-sm font-bold text-slate-500 hover:text-slate-900 transition-colors after:absolute after:bottom-[-26px] after:left-0 after:h-1 after:bg-indigo-600 after:rounded-t-full after:transition-all after:duration-300 after:w-0">
+                    Payments
+                </a>
+            </nav>
+        </div>
+
+        <!-- Right Side: User & Actions -->
+        <div class="flex items-center gap-6">
+            <app-notification-icon></app-notification-icon>
+            
+            <div class="hidden sm:flex flex-col items-end mr-4">
+                <span class="text-xs font-black text-slate-900 leading-none">{{ auth.username() }}</span>
+                <span class="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-1">Administrator</span>
+            </div>
+
+            <!-- Profile Dropdown Trigger -->
+            <div class="relative group">
+                <button
+                    class="w-11 h-11 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-700 font-black shadow-inner border border-indigo-100 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300">
+                    {{ auth.username().charAt(0).toUpperCase() }}
+                </button>
+
+                <!-- Simple hover dropdown menu (real apps would use a proper click trigger) -->
+                <div
+                    class="absolute right-0 top-full pt-2 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-300 w-48">
+                    <div class="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
+                        <div class="px-5 py-3 border-b border-slate-50">
+                            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Signed in as</p>
+                            <p class="text-xs font-bold text-slate-800 truncate">{{ auth.username() }}</p>
+                        </div>
+                        <button (click)="showPasswordModal = true"
+                            class="w-full text-left px-5 py-3 text-xs font-bold text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-2 border-b border-slate-50">
+                            <span class="material-icons text-base">lock_reset</span>
+                            Change Password
+                        </button>
+                        <button (click)="auth.logout()"
+                            class="w-full text-left px-5 py-3 text-xs font-bold text-rose-500 hover:bg-rose-50 transition-colors flex items-center gap-2">
+                            <span class="material-icons text-base">logout</span>
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTENT AREA -->
+    <main class="flex-1 overflow-y-auto">
+        <div class="max-w-[1440px] mx-auto p-10">
+            <router-outlet></router-outlet>
+        </div>
+    </main>
+</div>
+
+@if (showPasswordModal) {
+    <app-change-password-modal (close)="showPasswordModal = false"></app-change-password-modal>
+}

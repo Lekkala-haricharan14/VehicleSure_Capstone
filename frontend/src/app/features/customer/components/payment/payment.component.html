@@ -1,0 +1,65 @@
+    <div class="max-w-md mx-auto mt-10 p-6 bg-white rounded-2xl shadow-xl border border-slate-100 relative overflow-hidden">
+        <!-- Success/Error Overlays -->
+        <div *ngIf="showSuccess()" class="absolute inset-0 bg-white/95 backdrop-blur-sm z-10 flex flex-col items-center justify-center p-8 text-center animate-fade-in">
+            <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+            </div>
+            <h3 class="text-xl font-black text-slate-900 mb-2">Payment Successful!</h3>
+            <p class="text-slate-500 text-sm mb-6">Your policy documents have been generated. Redirecting you to dashboard...</p>
+            <button (click)="cancel()" class="bg-indigo-600 text-white font-bold px-6 py-2 rounded-xl">Go to Dashboard</button>
+        </div>
+
+        <div *ngIf="errorMessage()" class="absolute inset-0 bg-white/95 backdrop-blur-sm z-10 flex flex-col items-center justify-center p-8 text-center animate-fade-in">
+            <div class="w-16 h-16 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </div>
+            <h3 class="text-xl font-black text-slate-900 mb-2">Payment Failed</h3>
+            <p class="text-rose-600/70 text-sm mb-6">{{ errorMessage() }}</p>
+            <button (click)="errorMessage.set(null)" class="bg-slate-900 text-white font-bold px-6 py-2 rounded-xl">Try Again</button>
+        </div>
+
+        <h2 class="text-2xl font-bold text-slate-800 mb-6 font-display">Complete Payment</h2>
+        
+        <div class="mb-6 p-4 bg-indigo-50 rounded-xl border border-indigo-100">
+            <p class="text-xs text-indigo-700 font-bold uppercase tracking-wider">Policy ID: #{{policyId}}</p>
+            <p class="text-2xl font-black text-indigo-900 mt-1">Amount: {{amount | currency:'INR':'symbol':'1.0-0'}}</p>
+        </div>
+
+        <form (ngSubmit)="pay()" #payForm="ngForm" class="space-y-4">
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Card Holder Name</label>
+                <input type="text" required name="cardName" [(ngModel)]="cardInfo.name" placeholder="John Doe"
+                    class="w-full px-4 py-3 border-[1.5px] border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-indigo-100 transition-all">
+            </div>
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Card Number</label>
+                <input type="text" required name="cardNumber" [(ngModel)]="cardInfo.number" placeholder="XXXX XXXX XXXX XXXX"
+                    class="w-full px-4 py-3 border-[1.5px] border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-indigo-100 transition-all">
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Expiry</label>
+                    <input type="text" required name="expiry" [(ngModel)]="cardInfo.expiry" placeholder="MM/YY"
+                        class="w-full px-4 py-3 border-[1.5px] border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-indigo-100 transition-all">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">CVV</label>
+                    <input type="password" required name="cvv" [(ngModel)]="cardInfo.cvv" placeholder="***"
+                        class="w-full px-4 py-3 border-[1.5px] border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-indigo-100 transition-all">
+                </div>
+            </div>
+
+            <button type="submit" [disabled]="isLoading || !payForm.valid"
+                class="w-full bg-indigo-600 text-white py-4 rounded-xl font-black text-sm uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 active:scale-[0.98] disabled:opacity-50 mt-4">
+                {{ isLoading ? 'Processing Securely...' : 'Confirm & Pay Now' }}
+            </button>
+        </form>
+
+        <button (click)="cancel()" class="w-full mt-6 text-slate-400 hover:text-slate-600 text-xs font-bold uppercase tracking-wider transition-colors">
+            Cancel and Return
+        </button>
+    </div>

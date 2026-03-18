@@ -1,0 +1,54 @@
+<div class="max-w-6xl mx-auto">
+    <!-- Header Section -->
+    <div class="mb-10 text-center md:text-left">
+        <h1 class="text-3xl md:text-4xl font-black font-display text-slate-900 tracking-tight">
+            What would you like to insure?
+        </h1>
+        <p class="text-slate-500 mt-3 text-lg">Select a vehicle type to view and buy available policies instantly.</p>
+    </div>
+
+    <!-- 7-Option Grid (Acko Inspired) -->
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+
+        <a *ngFor="let option of vehicleOptions" [routerLink]="['/customer/buy/form']"
+            [queryParams]="{ type: option.typeParam }"
+            class="group relative bg-white border border-slate-200 rounded-[2rem] p-6 md:p-8 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 overflow-hidden cursor-pointer isolate flex flex-col items-center text-center">
+
+            <!-- Hover Background Gradient -->
+            <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"
+                [ngClass]="option.bgColor"></div>
+
+            <!-- Large Icon (SVG) -->
+            <div class="mb-6 group-hover:scale-110 transition-transform duration-300 origin-bottom flex justify-center"
+                [ngSwitch]="option.typeParam">
+                <span *ngSwitchCase="'CAR'" class="material-icons !text-[64px] text-indigo-500">directions_car</span>
+                <span *ngSwitchCase="'EV_CAR'" class="material-icons !text-[64px] text-emerald-500">electric_car</span>
+                <!-- Globe SVG from Heroicons matching the Two Wheeler look -->
+                <span *ngSwitchCase="'TWO_WHEELER'" class="material-icons !text-[64px] text-rose-500">two_wheeler</span>
+                <span *ngSwitchCase="'EV_TWO_WHEELER'"
+                    class="material-icons !text-[64px] text-teal-500">electric_moped</span>
+                <span *ngSwitchCase="'AUTO'" class="material-icons !text-[64px] text-amber-500">electric_rickshaw</span>
+                <span *ngSwitchCase="'EV_AUTO'"
+                    class="material-icons !text-[64px] text-blue-500">electric_rickshaw</span>
+                <span *ngSwitchCase="'HEAVY_VEHICLE'"
+                    class="material-icons !text-[64px] text-slate-500">local_shipping</span>
+            </div>
+
+            <!-- Details -->
+            <h3
+                class="text-lg md:text-xl font-bold text-slate-900 group-hover:{{option.textColor}} transition-colors mb-1">
+                {{ option.title }}
+            </h3>
+            <p class="text-xs md:text-sm text-slate-500">
+                {{ option.subtitle }}
+            </p>
+
+            <!-- Fake 'Arrow' indicator appearing on hover -->
+            <div class="absolute bottom-6 right-6 opacity-0 translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300"
+                [ngClass]="option.textColor">
+                <span class="material-icons !text-2xl">arrow_forward</span>
+            </div>
+        </a>
+
+    </div>
+</div>

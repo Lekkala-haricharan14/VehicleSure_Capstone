@@ -1,0 +1,233 @@
+<div class="space-y-6">
+
+    @if (appsSuccess()) {
+    <div
+        class="flex items-center gap-2 bg-green-50 border border-green-200 text-green-700 rounded-xl px-4 py-3 text-sm">
+        <span class="material-icons !text-[20px]">check_circle</span>
+        {{ appsSuccess() }}
+    </div>
+    }
+
+    @if (appsError()) {
+    <div
+        class="flex items-center gap-2 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl px-4 py-3 text-sm mb-4">
+        <span class="material-icons !text-[20px]">report_problem</span>
+        {{ appsError() }}
+    </div>
+    }
+
+    <!-- Status Filters & Controls -->
+    <div class="flex items-center justify-between mb-6">
+        <label
+            class="flex items-center gap-3 bg-white border border-slate-200 rounded-xl px-4 py-2 hover:border-indigo-300 transition-colors focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-100 shadow-sm cursor-pointer">
+            <span class="material-icons text-slate-400 !text-[20px]">filter_list</span>
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-widest hidden sm:block">Filter By:</span>
+            <select [ngModel]="statusFilter()" (ngModelChange)="statusFilter.set($event)"
+                class="bg-transparent border-none text-sm font-bold text-slate-900 focus:outline-none focus:ring-0 cursor-pointer w-48 appearance-none py-1">
+                @for (filter of STATUS_FILTERS; track filter.key) {
+                <option [value]="filter.key">
+                    {{ filter.label }} ({{ getStatusCount(filter.key) }})
+                </option>
+                }
+            </select>
+            <span class="material-icons text-slate-400 !text-[16px] pointer-events-none">expand_more</span>
+        </label>
+    </div>
+
+    @if (appsLoading()) {
+    <div class="flex items-center justify-center gap-3 py-20 text-slate-400">
+        <span
+            class="w-5 h-5 border-2 border-slate-300 border-t-amber-600 rounded-full animate-spin inline-block"></span>
+        Loading requests...
+    </div>
+    } @else if (filteredApplications().length === 0) {
+    <div class="text-center py-24 bg-white rounded-2xl border border-slate-100 italic text-slate-400">
+        No {{ statusFilter() !== 'ALL' ? statusFilter().toLowerCase().replace('_', ' ') : '' }} applications found.
+    </div>
+    } @else {
+    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+        <table class="w-full text-left border-collapse">
+            <thead class="bg-slate-50 border-b border-slate-200">
+                <tr>
+                    <th class="px-6 py-4 text-[10px] uppercase tracking-widest font-black text-slate-400">ID & Date</th>
+                    <th class="px-6 py-4 text-[10px] uppercase tracking-widest font-black text-slate-400">Customer</th>
+                    <th class="px-6 py-4 text-[10px] uppercase tracking-widest font-black text-slate-400">Vehicle</th>
+                    <th class="px-6 py-4 text-[10px] uppercase tracking-widest font-black text-slate-400">Plan</th>
+                    <th class="px-6 py-4 text-[10px] uppercase tracking-widest font-black text-slate-400">Status</th>
+                    <th class="px-6 py-4 text-[10px] uppercase tracking-widest font-black text-slate-400 text-right">
+                        Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+                @for (app of filteredApplications(); track app.vehicleApplicationId) {
+                <tr class="hover:bg-slate-50/50 transition-colors">
+                    <td class="px-6 py-4 text-xs font-bold text-slate-900 mb-0.5">#{{ app.vehicleApplicationId }}</td>
+                    <td class="px-6 py-4 text-xs font-bold text-slate-900">{{ app.customerName || app.vehicleOwnerName
+                        }}</td>
+                    <td class="px-6 py-4 text-xs font-bold text-slate-900">{{ app.make }} {{ app.model }}</td>
+                    <td class="px-6 py-4 text-xs font-bold text-indigo-700">{{ app.planName }}</td>
+                    <td class="px-6 py-4">
+                        <span
+                            class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black border"
+                            [class]="getStatusBadgeClass(app.status)">
+                            {{ app.status.replace('_', ' ') }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                        <button (click)="openReviewModal(app)"
+                            class="text-xs font-black text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-lg transition-all">
+                            Review
+                        </button>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    }
+</div>
+
+<!-- REVIEW MODAL -->
+@if (showReviewModal()) {
+<div class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-5 animate-fade-in"
+    (click)="closeReviewModal()">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg animate-slide-up overflow-hidden"
+        (click)="$event.stopPropagation()">
+        <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+            <h2 class="text-xl font-black text-slate-900">Review Application</h2>
+            <button (click)="closeReviewModal()" class="material-icons text-slate-400">close</button>
+        </div>
+        <div class="p-6 max-h-[80vh] overflow-y-auto custom-scrollbar">
+            @if (selectedApplication(); as app) {
+            <div class="space-y-6">
+                <!-- Info Grid -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                        <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Customer &
+                            Plan</label>
+                        <div class="text-xs font-black text-slate-900">{{ app.customerName || app.vehicleOwnerName }}
+                        </div>
+                        <div class="text-[11px] text-indigo-600 font-bold mt-1">{{ app.planName }}</div>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                        <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Status</label>
+                        <div class="mt-1">
+                            <span
+                                class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-black border"
+                                [class]="getStatusBadgeClass(app.status)">
+                                {{ app.status.replace('_', ' ') }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vehicle Details -->
+                <div class="space-y-3">
+                    <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Vehicle Information</h3>
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="border border-slate-100 p-3 rounded-xl bg-white shadow-sm">
+                            <div class="text-[9px] font-bold text-slate-400 uppercase">Make & Model</div>
+                            <div class="text-xs font-black text-slate-900">{{ app.make }} {{ app.model }}</div>
+                        </div>
+                        <div class="border border-slate-100 p-3 rounded-xl bg-white shadow-sm">
+                            <div class="text-[9px] font-bold text-slate-400 uppercase">Reg Number</div>
+                            <div class="text-xs font-black text-slate-900">{{ app.registrationNumber }}</div>
+                        </div>
+                        <div class="border border-slate-100 p-3 rounded-xl bg-white shadow-sm">
+                            <div class="text-[9px] font-bold text-slate-400 uppercase">Year</div>
+                            <div class="text-xs font-black text-slate-900">{{ app.year }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Documents -->
+                <div class="space-y-3">
+                    <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Verified Documents</h3>
+                    <div class="flex gap-3">
+                        <button (click)="viewDocument(app.rcDocumentPath)"
+                            class="flex-1 flex items-center justify-center gap-2 border border-slate-200 p-3 rounded-xl hover:bg-slate-50 transition-colors text-xs font-bold text-slate-600">
+                            <span class="material-icons !text-base text-indigo-500">description</span>
+                            View RC Copy
+                        </button>
+                        <button (click)="viewDocument(app.invoiceDocumentPath)"
+                            class="flex-1 flex items-center justify-center gap-2 border border-slate-200 p-3 rounded-xl hover:bg-slate-50 transition-colors text-xs font-bold text-slate-600">
+                            <span class="material-icons !text-base text-emerald-500">receipt_long</span>
+                            View Invoice
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Financials -->
+                <div class="bg-indigo-900 rounded-2xl p-5 text-white shadow-xl shadow-indigo-900/20">
+                    <div class="flex justify-between items-end">
+                        <div>
+                            <div
+                                class="text-[9px] font-black text-indigo-300 uppercase underline decoration-indigo-400/50 underline-offset-4">
+                                Premium to be Paid</div>
+                            <div class="text-2xl font-black mt-1">{{ formatCurrency(app.calculatedPremium) }}</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-[9px] font-black text-indigo-300 uppercase">IDV Value</div>
+                            <div class="text-sm font-bold">{{ formatCurrency(app.idv) }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin Action Area -->
+                <div class="pt-2">
+                    @if (app.status === 'UNDER_REVIEW') {
+                    <div class="space-y-5">
+                        <div class="h-px bg-slate-100"></div>
+
+                        <!-- Assignment Block -->
+                        <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-4">
+                            <label
+                                class="block text-[10px] font-black text-indigo-400 uppercase mb-3 text-center">Delegate
+                                to Underwriter</label>
+                            <div class="flex gap-2">
+                                <select #uwSelect
+                                    class="flex-1 bg-white border border-indigo-100 rounded-xl px-4 py-3 text-xs outline-none focus:ring-4 focus:ring-indigo-200/50 transition-all">
+                                    <option value="">Select Underwriter</option>
+                                    @for (uw of underwriters(); track uw.id) {
+                                    <option [value]="uw.id">{{ uw.username }} ({{ uw.activeApplicationsCount }} active)
+                                    </option>
+                                    }
+                                </select>
+                                <button (click)="assignToUnderwriter(uwSelect.value)"
+                                    class="bg-indigo-600 text-white font-bold px-6 py-3 rounded-xl hover:bg-indigo-700 transition-all text-sm shadow-lg shadow-indigo-200">
+                                    Assign
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    } @else if (app.status === 'ASSIGNED') {
+                    <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-4 mt-4 text-center">
+                        <div class="flex items-center justify-center gap-2 text-indigo-700 font-black text-xs mb-2">
+                            <span class="material-icons !text-sm">assignment_ind</span> Assigned to Underwriter
+                        </div>
+                        <p class="text-[10px] text-indigo-600 font-bold uppercase tracking-widest">{{ app.assignedUnderwriterName }}</p>
+                    </div>
+                    } @else if (app.status === 'REJECTED') {
+                    <div class="bg-rose-50 border border-rose-100 rounded-xl p-4 mt-4 text-center">
+                        <div class="flex items-center justify-center gap-2 text-rose-700 font-black text-xs mb-2">
+                            <span class="material-icons !text-sm">cancel</span> Application Rejected
+                        </div>
+                        <p class="text-[10px] text-rose-600 italic">{{ app.rejectionReason || 'No reason provided.' }}
+                        </p>
+                    </div>
+                    } @else if (app.status === 'APPROVED' || app.status === 'PAID') {
+                    <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-4 mt-4 text-center">
+                        <div class="flex items-center justify-center gap-2 text-emerald-700 font-black text-xs mb-2">
+                            <span class="material-icons !text-sm">check_circle</span> Application Approved
+                        </div>
+                        <p class="text-[10px] text-emerald-600 font-bold uppercase tracking-widest">Active/Process
+                            Completed</p>
+                    </div>
+                    }
+                </div>
+            </div>
+            }
+        </div>
+    </div>
+</div>
+}

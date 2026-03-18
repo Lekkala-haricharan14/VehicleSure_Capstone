@@ -1,0 +1,450 @@
+<div class="max-w-3xl mx-auto pb-12">
+    <!-- Header -->
+    <div class="mb-6">
+        @if (currentStep === 1) {
+        <button onclick="history.back()"
+            class="flex items-center text-sm font-medium text-slate-500 hover:text-indigo-600 mb-4 transition-colors">
+            <span class="material-icons !text-base mr-1">arrow_back</span>
+            Back to Selection
+        </button>
+        }
+        @if (currentStep === 2) {
+        <button (click)="goToStep1()"
+            class="flex items-center text-sm font-medium text-slate-500 hover:text-indigo-600 mb-4 transition-colors">
+            <span class="material-icons !text-base mr-1">arrow_back</span>
+            Back to Vehicle Details
+        </button>
+        }
+
+        <h1 class="text-3xl font-black text-slate-900 font-display tracking-tight leading-tight">
+            {{ currentStep === 1 ? 'Details for ' + vehicleType : 'Choose Quote & Tenure' }}
+        </h1>
+        <p class="text-slate-500 mt-1">
+            {{ currentStep === 1 ? 'Provide vehicle details to calculate an accurate quote.' : 'Customized quotes based
+            on your vehicle profile.' }}
+        </p>
+    </div>
+
+    <!-- Stepper Indicator -->
+    @if (!submitSuccess) {
+    <div class="flex items-center gap-3 mb-8">
+        <div class="flex-1 h-2 rounded-full transition-all duration-500"
+            [ngClass]="currentStep >= 1 ? 'bg-indigo-600' : 'bg-slate-200'"></div>
+        <div class="flex-1 h-2 rounded-full transition-all duration-500"
+            [ngClass]="currentStep >= 2 ? 'bg-indigo-600' : 'bg-slate-200'"></div>
+    </div>
+    }
+
+    <!-- Success Message -->
+    @if (submitSuccess) {
+    <div
+        class="bg-emerald-50 text-emerald-600 p-8 rounded-3xl flex items-center gap-5 mb-6 border border-emerald-100 animate-fade-in shadow-xl shadow-emerald-100/50">
+        <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center flex-shrink-0 shadow-sm">
+            <span class="material-icons !text-[32px] text-emerald-500">check_circle</span>
+        </div>
+        <div>
+            <h3 class="font-black text-xl mb-1">Application Submitted Successfully!</h3>
+            <p class="opacity-90 font-medium">Your request is under review. Redirecting to dashboard...</p>
+        </div>
+    </div>
+    }
+
+    <!-- Error Alert -->
+    @if (submitError) {
+    <div
+        class="bg-rose-50 border border-rose-200 text-rose-700 px-5 py-4 rounded-xl mb-6 flex items-start gap-3">
+        <span class="material-icons !text-[24px]">report_problem</span>
+        <span class="text-sm font-medium">{{ submitError }}</span>
+    </div>
+    }
+
+    @if (!submitSuccess) {
+    <form [formGroup]="applicationForm" (ngSubmit)="onSubmit()"
+        class="bg-white rounded-[2rem] shadow-xl shadow-slate-200/40 p-6 md:p-8 border border-slate-100">
+
+        <!-- ======================= -->
+        <!-- STEP 1: VEHICLE DETAILS -->
+        <!-- ======================= -->
+        @if (currentStep === 1) {
+        <div class="animate-fade-in">
+            <h3 class="text-lg font-bold text-slate-800 border-b border-slate-100 pb-3 mb-6 flex items-center gap-2">
+                <span
+                    class="w-6 h-6 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center text-xs">1</span>
+                Vehicle & Owner Information
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Owner Full Name</label>
+                    <input type="text" formControlName="vehicleOwnerName"
+                        class="w-full px-4 py-3 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow outline-none text-slate-700"
+                        [ngClass]="(applicationForm.get('vehicleOwnerName')?.invalid && applicationForm.get('vehicleOwnerName')?.touched) ? 'border-rose-400 ring-1 ring-rose-400' : 'border-slate-200'"
+                        placeholder="e.g., John Doe">
+                    @if (applicationForm.get('vehicleOwnerName')?.invalid && applicationForm.get('vehicleOwnerName')?.touched) {
+                    <div class="text-xs text-rose-500 mt-1.5 font-medium ml-1">Owner name is required.</div>
+                    }
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Registration Number</label>
+                    <input type="text" formControlName="registrationNumber"
+                        class="w-full px-4 py-3 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow outline-none text-slate-700 uppercase"
+                        [ngClass]="(applicationForm.get('registrationNumber')?.invalid && applicationForm.get('registrationNumber')?.touched) ? 'border-rose-400 ring-1 ring-rose-400' : 'border-slate-200'"
+                        placeholder="e.g., MH12AB1234">
+                    @if (applicationForm.get('registrationNumber')?.invalid && applicationForm.get('registrationNumber')?.touched) {
+                    <div class="text-xs text-rose-500 mt-1.5 font-medium ml-1">
+                        @if (applicationForm.get('registrationNumber')?.hasError('required')) {<span>Registration number is required.</span>}
+                        @if (applicationForm.get('registrationNumber')?.hasError('pattern')) {<span>Invalid format. Must be XX00XX0000 (e.g. MH12AB1234).</span>}
+                    </div>
+                    }
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Make (Brand)</label>
+                    <input type="text" formControlName="make"
+                        class="w-full px-4 py-3 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow outline-none text-slate-700"
+                        [ngClass]="(applicationForm.get('make')?.invalid && applicationForm.get('make')?.touched) ? 'border-rose-400 ring-1 ring-rose-400' : 'border-slate-200'"
+                        placeholder="e.g., Hyundai">
+                    @if (applicationForm.get('make')?.invalid && applicationForm.get('make')?.touched) {
+                    <div class="text-xs text-rose-500 mt-1.5 font-medium ml-1">Vehicle make is required.</div>
+                    }
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Model</label>
+                    <input type="text" formControlName="model"
+                        class="w-full px-4 py-3 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow outline-none text-slate-700"
+                        [ngClass]="(applicationForm.get('model')?.invalid && applicationForm.get('model')?.touched) ? 'border-rose-400 ring-1 ring-rose-400' : 'border-slate-200'"
+                        placeholder="e.g., i20 Asta">
+                    @if (applicationForm.get('model')?.invalid && applicationForm.get('model')?.touched) {
+                    <div class="text-xs text-rose-500 mt-1.5 font-medium ml-1">Vehicle model is required.</div>
+                    }
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Manufacturing Year</label>
+                    <input type="number" formControlName="year"
+                        class="w-full px-4 py-3 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow outline-none text-slate-700"
+                        [ngClass]="(applicationForm.get('year')?.invalid && applicationForm.get('year')?.touched) ? 'border-rose-400 ring-1 ring-rose-400' : 'border-slate-200'">
+                    @if (applicationForm.get('year')?.invalid && applicationForm.get('year')?.touched) {
+                    <div class="text-xs text-rose-500 mt-1.5 font-medium ml-1">
+                        @if (applicationForm.get('year')?.hasError('required')) {<span>Year is required.</span>}
+                        @if (applicationForm.get('year')?.hasError('min')) {<span>Must be 1900 or later.</span>}
+                        @if (applicationForm.get('year')?.hasError('max')) {<span>Cannot be in the future.</span>}
+                    </div>
+                    }
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Fuel Type</label>
+                    <select formControlName="fuelType"
+                        class="w-full px-4 py-3 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow outline-none text-slate-700"
+                        [ngClass]="(applicationForm.get('fuelType')?.invalid && applicationForm.get('fuelType')?.touched) ? 'border-rose-400 ring-1 ring-rose-400' : 'border-slate-200'">
+                        <option value="">Select Fuel Type</option>
+                        <option value="PETROL">Petrol</option>
+                        <option value="DIESEL">Diesel</option>
+                        <option value="CNG">CNG</option>
+                        <option value="ELECTRIC">Electric</option>
+                    </select>
+                    @if (applicationForm.get('fuelType')?.invalid && applicationForm.get('fuelType')?.touched) {
+                    <div class="text-xs text-rose-500 mt-1.5 font-medium ml-1">Please select fuel type.</div>
+                    }
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Transmission Type</label>
+                    <select formControlName="transmissionType"
+                        class="w-full px-4 py-3 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow outline-none text-slate-700"
+                        [ngClass]="(applicationForm.get('transmissionType')?.invalid && applicationForm.get('transmissionType')?.touched) ? 'border-rose-400 ring-1 ring-rose-400' : 'border-slate-200'">
+                        <option value="">Select Transmission</option>
+                        <option value="MANUAL">Manual</option>
+                        <option value="AUTOMATIC">Automatic</option>
+                    </select>
+                    @if (applicationForm.get('transmissionType')?.invalid && applicationForm.get('transmissionType')?.touched) {
+                    <div class="text-xs text-rose-500 mt-1.5 font-medium ml-1">Please select transmission.</div>
+                    }
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Accidents in Past</label>
+                    <input type="number" formControlName="accidentsInPast"
+                        class="w-full px-4 py-3 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow outline-none text-slate-700"
+                        [ngClass]="(applicationForm.get('accidentsInPast')?.invalid && applicationForm.get('accidentsInPast')?.touched) ? 'border-rose-400 ring-1 ring-rose-400' : 'border-slate-200'">
+                    @if (applicationForm.get('accidentsInPast')?.invalid && applicationForm.get('accidentsInPast')?.touched) {
+                    <div class="text-xs text-rose-500 mt-1.5 font-medium ml-1">
+                        @if (applicationForm.get('accidentsInPast')?.hasError('required')) {<span>Required field.</span>}
+                        @if (applicationForm.get('accidentsInPast')?.hasError('min') || applicationForm.get('accidentsInPast')?.hasError('pattern')) {<span>Must be 0 or higher.</span>}
+                    </div>
+                    }
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Chassis Number (VIN)</label>
+                    <input type="text" formControlName="chassisNumber"
+                        class="w-full px-4 py-3 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow outline-none text-slate-700 uppercase tracking-widest"
+                        [ngClass]="(applicationForm.get('chassisNumber')?.invalid && applicationForm.get('chassisNumber')?.touched) ? 'border-rose-400 ring-1 ring-rose-400' : 'border-slate-200'"
+                        placeholder="17-character VIN">
+                    @if (applicationForm.get('chassisNumber')?.invalid && applicationForm.get('chassisNumber')?.touched) {
+                    <div class="text-xs text-rose-500 mt-1.5 font-medium ml-1">
+                        @if (applicationForm.get('chassisNumber')?.hasError('required')) {<span>Chassis number is required.</span>}
+                        @if (applicationForm.get('chassisNumber')?.hasError('pattern')) {<span>Must be exactly 17 characters (numbers and uppercase letters, excluding I, O, Q).</span>}
+                    </div>
+                    }
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Distance Driven (km)</label>
+                    <input type="number" formControlName="distanceDriven"
+                        class="w-full px-4 py-3 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow outline-none text-slate-700"
+                        [ngClass]="(applicationForm.get('distanceDriven')?.invalid && applicationForm.get('distanceDriven')?.touched) ? 'border-rose-400 ring-1 ring-rose-400' : 'border-slate-200'">
+                    @if (applicationForm.get('distanceDriven')?.invalid && applicationForm.get('distanceDriven')?.touched) {
+                    <div class="text-xs text-rose-500 mt-1.5 font-medium ml-1">
+                        @if (applicationForm.get('distanceDriven')?.hasError('required')) {<span>Distance is required.</span>}
+                        @if (applicationForm.get('distanceDriven')?.hasError('min') || applicationForm.get('distanceDriven')?.hasError('pattern')) {<span>Must be a positive number.</span>}
+                    </div>
+                    }
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Ex-Showroom Price (₹)</label>
+                    <input type="number" formControlName="exShowroomPrice"
+                        class="w-full px-4 py-3 bg-indigo-50 border-2 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow outline-none text-slate-900 font-bold"
+                        [ngClass]="(applicationForm.get('exShowroomPrice')?.invalid && applicationForm.get('exShowroomPrice')?.touched) ? 'border-rose-400 ring-rose-400' : 'border-indigo-100'"
+                        placeholder="Used to calculate IDV">
+                    @if (applicationForm.get('exShowroomPrice')?.invalid && applicationForm.get('exShowroomPrice')?.touched) {
+                    <div class="text-xs text-rose-500 mt-1.5 font-medium ml-1">Price is required (min: 1000).</div>
+                    }
+                </div>
+            </div>
+
+            <!-- Documents -->
+            <div class="mt-8 mb-6">
+                <h3 class="text-lg font-bold text-slate-800 border-b border-slate-100 pb-3 mb-6 flex items-center gap-2">
+                    <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center text-xs">2</span>
+                    Verification Documents
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- RC Upload -->
+                    <div class="border-2 border-dashed border-slate-200 rounded-2xl p-5 text-center hover:border-indigo-300 hover:bg-slate-50 transition-colors relative cursor-pointer"
+                        [ngClass]="{'border-emerald-300 bg-emerald-50/30': rcFile}">
+                        <input type="file" (change)="onFileSelected($event, 'rc')" accept=".pdf,image/*"
+                            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                        @if (!rcFile) {
+                        <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center mx-auto mb-3">
+                            <span class="material-icons !text-[24px]">description</span>
+                        </div>
+                        }
+                        @if (rcFile) {
+                        <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center mx-auto mb-3">
+                            <span class="material-icons !text-[24px]">check_circle</span>
+                        </div>
+                        }
+                        <h4 class="font-bold text-sm text-slate-900">RC Document</h4>
+                        <p class="text-xs text-slate-500 mt-1 mb-2">Upload Registration Certificate (PDF/Img)</p>
+                        @if (rcFile) {
+                        <span class="inline-flex py-1 px-3 rounded-lg bg-emerald-100 text-emerald-700 text-xs font-bold max-w-full truncate">
+                            {{ rcFile.name }}
+                        </span>
+                        }
+                    </div>
+
+                    <!-- Invoice Upload -->
+                    <div class="border-2 border-dashed border-slate-200 rounded-2xl p-5 text-center hover:border-indigo-300 hover:bg-slate-50 transition-colors relative cursor-pointer"
+                        [ngClass]="{'border-emerald-300 bg-emerald-50/30': invoiceFile}">
+                        <input type="file" (change)="onFileSelected($event, 'invoice')" accept=".pdf,image/*"
+                            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                        @if (!invoiceFile) {
+                        <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center mx-auto mb-3">
+                            <span class="material-icons !text-[24px]">receipt</span>
+                        </div>
+                        }
+                        @if (invoiceFile) {
+                        <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center mx-auto mb-3">
+                            <span class="material-icons !text-[24px]">check_circle</span>
+                        </div>
+                        }
+                        <h4 class="font-bold text-sm text-slate-900">Vehicle Invoice</h4>
+                        <p class="text-xs text-slate-500 mt-1 mb-2">Upload original invoice (PDF/Img)</p>
+                        @if (invoiceFile) {
+                        <span class="inline-flex py-1 px-3 rounded-lg bg-emerald-100 text-emerald-700 text-xs font-bold max-w-full truncate">
+                            {{ invoiceFile.name }}
+                        </span>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Get Quote Button -->
+            <button type="button" (click)="goToStep2()" [disabled]="isLoadingQuotes"
+                class="w-full bg-slate-900 hover:bg-slate-800 disabled:opacity-70 text-white font-bold py-4 rounded-xl shadow-lg shadow-slate-900/20 transition-all flex items-center justify-center gap-2 text-lg group">
+                @if (isLoadingQuotes) {
+                <span class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                Generating Custom Quotes...
+                } @else {
+                Proceed to Quotes
+                <span class="material-icons !text-[20px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                }
+            </button>
+        </div>
+        }
+
+        <!-- ======================= -->
+        <!-- STEP 2: PLAN & QUOTE    -->
+        <!-- ======================= -->
+        @if (currentStep === 2) {
+        <div class="animate-fade-in">
+
+            <!-- Vehicle Summary & IDV -->
+            <div
+                class="bg-indigo-50 border border-indigo-100 rounded-2xl p-5 mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <p class="text-sm font-bold text-indigo-500 uppercase tracking-wider mb-1">Vehicle Summary</p>
+                    <h3 class="text-xl font-black text-slate-900">{{ applicationForm.value.make }} {{
+                        applicationForm.value.model }}</h3>
+                    <p class="text-sm font-medium text-slate-600 mt-0.5">Year: {{ applicationForm.value.year }} • {{
+                        applicationForm.value.fuelType }}</p>
+                </div>
+                <div class="md:text-right bg-white p-4 rounded-xl shadow-sm border border-indigo-100/50">
+                    <p
+                        class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1 flex items-center md:justify-end gap-1">
+                        Calculated IDV
+                        <span
+                            class="w-4 h-4 rounded-full bg-slate-100 flex items-center justify-center text-[10px] cursor-help"
+                            title="Insured Declared Value: Current market value of vehicle">i</span>
+                    </p>
+                    <h3 class="text-2xl font-black text-indigo-700">₹{{ calculatedIdv | number:'1.0-0' }}</h3>
+                </div>
+            </div>
+
+            <!-- Tenure Selection Toggle -->
+            <div class="mb-8">
+                <h3 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-3 text-center">Select Plan
+                    Tenure</h3>
+                <div class="flex gap-2 max-w-sm mx-auto bg-slate-100 p-1.5 rounded-2xl shadow-inner">
+                    <button type="button" (click)="selectTenure(1)"
+                        class="flex-1 py-2.5 rounded-xl text-sm font-bold transition-all relative"
+                        [ngClass]="selectedTenure === 1 ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'">
+                        1 Year
+                    </button>
+                    <button type="button" (click)="selectTenure(2)"
+                        class="flex-1 py-2.5 rounded-xl text-sm font-bold transition-all relative"
+                        [ngClass]="selectedTenure === 2 ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'">
+                        2 Years
+                        <span
+                            class="absolute -top-3 -right-2 bg-emerald-100 text-emerald-700 text-[9px] px-1.5 py-0.5 rounded-full font-black uppercase tracking-wider border border-emerald-200 shadow-sm border-b-2">Save
+                            ~5%</span>
+                    </button>
+                    <button type="button" (click)="selectTenure(3)"
+                        class="flex-1 py-2.5 rounded-xl text-sm font-bold transition-all relative"
+                        [ngClass]="selectedTenure === 3 ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'">
+                        3 Years
+                        <span
+                            class="absolute -top-3 -right-2 bg-emerald-100 text-emerald-700 text-[9px] px-1.5 py-0.5 rounded-full font-black uppercase tracking-wider border border-emerald-200 shadow-sm border-b-2">Save
+                            ~8%</span>
+                    </button>
+                </div>
+            </div>
+
+            @if (availablePlans.length === 0) {
+            <div
+                class="text-sm text-slate-500 bg-slate-50 p-6 rounded-2xl text-center border border-dashed border-slate-300">
+                Loading available plans... or no plans available for this vehicle type.
+            </div>
+            }
+
+            <!-- Plan Cards -->
+            @if (availablePlans.length > 0) {
+            <div class="space-y-4 mb-8">
+                @for (plan of availablePlans; track plan.planId) {
+                <label
+                    class="block relative cursor-pointer border-2 rounded-[1.5rem] p-5 md:p-6 transition-all group overflow-hidden"
+                    [ngClass]="{'border-indigo-600 bg-indigo-50/20 shadow-xl shadow-indigo-100/50': applicationForm.get('planId')?.value === plan.planId, 'border-slate-200 hover:border-indigo-300 bg-white shadow-sm': applicationForm.get('planId')?.value !== plan.planId}">
+
+                    <input type="radio" formControlName="planId" [value]="plan.planId" class="sr-only">
+
+                    <!-- Selected Outline Glow -->
+                    @if (applicationForm.get('planId')?.value === plan.planId) {
+                    <div class="absolute inset-0 border-4 border-indigo-600/10 rounded-[1.5rem] pointer-events-none">
+                    </div>
+                    }
+
+                    <div class="flex flex-col md:flex-row justify-between gap-6">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="w-10 h-10 rounded-full flex items-center justify-center border-2"
+                                    [ngClass]="applicationForm.get('planId')?.value === plan.planId ? 'bg-indigo-600 border-indigo-600 text-white' : 'bg-slate-50 border-slate-200 text-slate-400 group-hover:border-indigo-300'">
+                                    @if (applicationForm.get('planId')?.value !== plan.planId) {
+                                    <span class="material-icons !text-xl">radio_button_unchecked</span>
+                                    }
+                                    @if (applicationForm.get('planId')?.value === plan.planId) {
+                                    <span class="material-icons !text-2xl">check_circle</span>
+                                    }
+                                </div>
+                                <div>
+                                    <span
+                                        class="inline-flex py-0.5 px-2.5 rounded-md bg-slate-100 text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">{{
+                                        plan.policyType }}</span>
+                                    <h4 class="text-xl font-black text-slate-900 leading-none">{{ plan.planName }}</h4>
+                                </div>
+                            </div>
+
+                            <p class="text-sm text-slate-500 mt-3 md:pl-13 pl-13 pr-4 leading-relaxed">{{
+                                plan.description }}</p>
+
+                            <!-- Features Checklist -->
+                            <ul class="mt-4 md:pl-13 pl-13 space-y-2">
+                                <li class="flex items-start gap-2 text-sm text-slate-600 font-medium">
+                                    <span class="material-icons !text-xl text-emerald-500 shrink-0 mt-0.5">check</span>
+                                    Third-party property damages & injuries
+                                </li>
+                                @if (plan.policyType === 'COMPREHENSIVE') {
+                                <li class="flex items-start gap-2 text-sm text-slate-600 font-medium">
+                                    <span class="material-icons !text-xl text-emerald-500 shrink-0 mt-0.5">check</span>
+                                    Accidental damages, fire, and theft
+                                </li>
+                                }
+                            </ul>
+                        </div>
+
+                        <!-- Price Section -->
+                        <div
+                            class="pt-5 md:pt-0 md:pl-6 md:border-l border-slate-200 flex flex-col justify-center items-start md:items-end min-w-[140px]">
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Total Premium</p>
+                            <span class="block text-3xl font-black text-indigo-700 tracking-tight">₹{{
+                                getPremiumForPlan(plan.planId) | number:'1.0-0' }}</span>
+                            <span class="text-xs font-semibold text-slate-500 mt-1">For {{ selectedTenure }} Year{{
+                                selectedTenure > 1 ? 's' : '' }}</span>
+
+                            @if (selectedTenure > 1) {
+                            <div class="mt-auto pt-4">
+                                <span
+                                    class="bg-emerald-50 text-emerald-600 text-xs font-bold px-2.5 py-1 rounded-lg border border-emerald-100 flex items-center gap-1">
+                                    <span class="material-icons !text-base">verified</span>
+                                    Multi-year Discount
+                                </span>
+                            </div>
+                            }
+                        </div>
+                    </div>
+                </label>
+                }
+            </div>
+            }
+
+            <!-- (Documents moved to Step 1) -->
+
+            <!-- Policy Request Button -->
+            <button type="submit" [disabled]="isSubmitting"
+                class="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-70 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl shadow-lg shadow-indigo-600/30 transition-all flex items-center justify-center gap-2 text-lg">
+                @if (isSubmitting) {
+                <span class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                }
+                {{ isSubmitting ? 'Submitting Application for Review...' : 'Submit Policy Request (₹' +
+                (getPremiumForPlan(applicationForm.get('planId')?.value || 0)) + ')' }}
+            </button>
+        </div>
+        }
+
+    </form>
+    }
+</div>

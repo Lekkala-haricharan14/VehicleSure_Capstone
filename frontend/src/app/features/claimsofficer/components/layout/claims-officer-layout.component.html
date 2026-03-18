@@ -1,0 +1,58 @@
+    <div class="min-h-screen bg-slate-50 font-sans selection:bg-indigo-100 selection:text-indigo-900 flex flex-col">
+      <!-- Top Navbar -->
+      <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/60 shadow-sm">
+        <div class="max-w-[1600px] mx-auto px-6 lg:px-10 h-20 flex items-center justify-between">
+          
+          <div class="flex items-center gap-12">
+            <!-- Branding -->
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-600/20">
+                <span class="material-icons text-white text-xl">policy</span>
+              </div>
+              <span class="text-xl font-black bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-700 tracking-tight">VehicleSure</span>
+            </div>
+
+            <!-- Navigation Links -->
+            <div class="hidden md:flex items-center gap-2">
+              <a routerLink="/claims-officer/dashboard" routerLinkActive="bg-slate-100 text-slate-900 shadow-sm border border-slate-200"
+                 class="px-5 py-2.5 rounded-xl text-sm font-bold text-slate-500 hover:text-slate-900 hover:bg-slate-50 transition-all border border-transparent flex items-center gap-2">
+                <span class="material-icons text-[18px]">dashboard</span>
+                Dashboard
+              </a>
+              <a routerLink="/claims-officer/history" routerLinkActive="bg-slate-100 text-slate-900 shadow-sm border border-slate-200"
+                 class="px-5 py-2.5 rounded-xl text-sm font-bold text-slate-500 hover:text-slate-900 hover:bg-slate-50 transition-all border border-transparent flex items-center gap-2">
+                <span class="material-icons text-[18px]">history</span>
+                History
+              </a>
+            </div>
+          </div>
+
+          <!-- User Actions -->
+          <div class="flex items-center gap-6">
+            <app-notification-icon></app-notification-icon>
+            
+            <div class="flex items-center gap-3 pl-4 border-l border-slate-100">
+              <div class="text-right hidden sm:block">
+                <p class="text-sm font-bold text-slate-900 leading-none mb-1">{{ officerName() }}</p>
+                <p class="text-[10px] font-black text-slate-400 tracking-wider uppercase">Claims Officer</p>
+              </div>
+              <button (click)="showPasswordModal = true" title="Change Password" class="w-10 h-10 rounded-[12px] bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 transition-all shadow-sm">
+                <span class="material-icons text-lg">lock_reset</span>
+              </button>
+              <button (click)="logout()" title="Logout" class="w-10 h-10 rounded-[12px] bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 transition-all shadow-sm">
+                <span class="material-icons text-lg">logout</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Main Content Route Outlet -->
+      <main class="flex-1 max-w-[1600px] mx-auto w-full">
+        <router-outlet></router-outlet>
+      </main>
+    </div>
+
+    @if (showPasswordModal) {
+        <app-change-password-modal (close)="showPasswordModal = false"></app-change-password-modal>
+    }

@@ -1,0 +1,320 @@
+<div class="space-y-6">
+    <!-- Status Filters & Controls -->
+    <div class="flex items-center justify-between mb-6">
+        <label
+            class="flex items-center gap-3 bg-white border border-slate-200 rounded-xl px-4 py-2 hover:border-indigo-300 transition-colors focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-100 shadow-sm cursor-pointer">
+            <span class="material-icons text-slate-400 !text-[20px]">filter_list</span>
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-widest hidden sm:block">Filter By:</span>
+            <select [ngModel]="statusFilter()" (ngModelChange)="statusFilter.set($event)"
+                class="bg-transparent border-none text-sm font-bold text-slate-900 focus:outline-none focus:ring-0 cursor-pointer w-48 appearance-none py-1">
+                @for (filter of STATUS_FILTERS; track filter.key) {
+                <option [value]="filter.key">
+                    {{ filter.label }} ({{ getStatusCount(filter.key) }})
+                </option>
+                }
+            </select>
+            <span class="material-icons text-slate-400 !text-[16px] pointer-events-none">expand_more</span>
+        </label>
+    </div>
+
+    @if (isLoading()) {
+    <div class="flex items-center justify-center gap-3 py-20 text-slate-400">
+        <span
+            class="w-5 h-5 border-2 border-slate-300 border-t-amber-600 rounded-full animate-spin inline-block"></span>
+        Loading claims...
+    </div>
+    } @else if (filteredClaims().length === 0) {
+    <div class="text-center py-24 bg-white rounded-3xl border border-slate-200 shadow-sm italic text-slate-400">
+        No {{ statusFilter() !== 'ALL' ? statusFilter().toLowerCase().replace('_', ' ') : '' }} claims found.
+    </div>
+    } @else {
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden text-sm">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="bg-slate-50 border-b border-slate-200">
+                        <th class="px-6 py-4 text-[10px] uppercase tracking-widest font-black text-slate-400">Claim
+                            Details</th>
+                        <th class="px-6 py-4 text-[10px] uppercase tracking-widest font-black text-slate-400">Policy
+                        </th>
+                        <th class="px-6 py-4 text-[10px] uppercase tracking-widest font-black text-slate-400">Customer
+                        </th>
+                        <th class="px-6 py-4 text-[10px] uppercase tracking-widest font-black text-slate-400">Status
+                        </th>
+                        <th class="px-6 py-4 text-[10px] uppercase tracking-widest font-black text-slate-400">Assigned
+                            To</th>
+                        <th class="px-6 py-4 text-[10px] uppercase tracking-widest font-black text-slate-400">Rejection
+                            Reason
+                        </th>
+                        <th class="px-6 py-4 text-[10px] uppercase tracking-widest font-black text-slate-400">Action
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    @for (claim of filteredClaims(); track claim.claimId) {
+                    <tr class="hover:bg-slate-50/50 transition-colors">
+                        <td class="px-6 py-4">
+                            <div class="font-bold text-slate-900">#{{ claim.claimNumber }}</div>
+                            <div class="text-[11px] text-indigo-600 font-bold uppercase tracking-wider">{{
+                                claim.claimType }}</div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="font-semibold text-slate-700">{{ claim.policyNumber }}</div>
+                        </td>
+                        <td class="px-6 py-4 font-medium text-slate-600">
+                            {{ claim.customerName }}
+                        </td>
+                        <td class="px-6 py-4">
+                            <span
+                                [class]="'px-2.5 py-1 rounded-full text-[10px] font-black ' + getStatusClass(claim.status)">
+                                {{ claim.status }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 px-6 py-4 text-slate-500">
+                            {{ claim.claimsOfficerName || 'Not Assigned' }}
+                        </td>
+                        <td class="px-6 py-4 text-xs text-rose-600 max-w-[150px] truncate"
+                            [title]="claim.rejectionReason || ''">
+                            {{ claim.rejectionReason || '-' }}
+                        </td>
+                        <td class="px-6 py-4">
+                            <button (click)="openAssignModal(claim)"
+                                class="px-4 py-1.5 bg-slate-900 text-white rounded-lg text-xs font-bold hover:bg-indigo-600 transition-all shadow-sm">
+                                {{ claim.status === 'SUBMITTED' ? 'Review & Assign' : 'View Details' }}
+                            </button>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Detailed Review & Assignment Modal -->
+    @if (showModal && selectedClaim()) {
+    <div
+        class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300">
+        <div
+            class="bg-white w-full max-w-4xl rounded-[32px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col max-h-[90vh]">
+
+            <!-- Modal Header -->
+            <div class="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                <div>
+                    <div class="flex items-center gap-3 mb-1">
+                        <span
+                            class="px-2 py-0.5 bg-indigo-100 text-indigo-700 rounded text-[10px] font-black uppercase tracking-wider">
+                            {{ selectedClaim()?.claimType }}
+                        </span>
+                        <h3 class="text-xl font-black text-slate-900">Claim #{{ selectedClaim()?.claimNumber }}</h3>
+                    </div>
+                    <p class="text-sm text-slate-500">Review submitted evidence and assign a claims officer for
+                        investigation.</p>
+                </div>
+                <button (click)="closeModal()"
+                    class="w-10 h-10 rounded-full hover:bg-slate-200/50 flex items-center justify-center transition-colors">
+                    <span class="material-icons text-slate-400">close</span>
+                </button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-8 lg:p-10">
+                <div class="grid lg:grid-cols-12 gap-10">
+
+                    <!-- Left Content: Claim Details & Documents -->
+                    <div class="lg:col-span-7 space-y-10">
+
+                        <!-- Summary Grid -->
+                        <section>
+                            <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4">Claim
+                                Summary</h4>
+                            <div class="grid grid-cols-2 gap-6 bg-slate-50 p-6 rounded-3xl border border-slate-100">
+                                <div>
+                                    <p class="text-[11px] text-slate-400 font-bold uppercase mb-1">Customer</p>
+                                    <p class="font-bold text-slate-900">{{ selectedClaim()?.customerName }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-[11px] text-slate-400 font-bold uppercase mb-1">Policy Number</p>
+                                    <p class="font-bold text-indigo-600">{{ selectedClaim()?.policyNumber }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-[11px] text-slate-400 font-bold uppercase mb-1">Status</p>
+                                    <span
+                                        [class]="'px-2 py-0.5 rounded-full text-[9px] font-black ' + getStatusClass(selectedClaim()?.status || '')">
+                                        {{ selectedClaim()?.status }}
+                                    </span>
+                                </div>
+                                <div>
+                                    <p class="text-[11px] text-slate-400 font-bold uppercase mb-1">Current Officer</p>
+                                    <p class="font-bold text-slate-600">{{ selectedClaim()?.claimsOfficerName ||
+                                        'Unassigned' }}</p>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Evidence Documents -->
+                        <section>
+                            <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4">Evidence &
+                                Documents</h4>
+                            <div class="space-y-3">
+                                @if (selectedClaim()?.document1Path) {
+                                <a [href]="getDocUrl(selectedClaim()?.document1Path!)" target="_blank"
+                                    class="flex items-center justify-between p-4 bg-white border border-slate-200 rounded-2xl hover:border-indigo-300 hover:shadow-lg hover:shadow-indigo-50 transition-all group">
+                                    <div class="flex items-center gap-4">
+                                        <div
+                                            class="w-10 h-10 bg-rose-50 rounded-xl flex items-center justify-center text-rose-600 transition-colors group-hover:bg-rose-600 group-hover:text-white">
+                                            <span class="material-icons">description</span>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-bold text-slate-900">Claim Evidence Document 1</p>
+                                            <p class="text-[10px] text-slate-400 font-medium">Click to view/download</p>
+                                        </div>
+                                    </div>
+                                    <span
+                                        class="material-icons text-slate-300 group-hover:text-indigo-600 transition-colors">open_in_new</span>
+                                </a>
+                                }
+                                @if (selectedClaim()?.document2Path) {
+                                <a [href]="getDocUrl(selectedClaim()?.document2Path!)" target="_blank"
+                                    class="flex items-center justify-between p-4 bg-white border border-slate-200 rounded-2xl hover:border-indigo-300 hover:shadow-lg hover:shadow-indigo-50 transition-all group">
+                                    <div class="flex items-center gap-4">
+                                        <div
+                                            class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600 transition-colors group-hover:bg-blue-600 group-hover:text-white">
+                                            <span class="material-icons">receipt_long</span>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-bold text-slate-900">Claim Invoice/Bill</p>
+                                            <p class="text-[10px] text-slate-400 font-medium">Click to view/download</p>
+                                        </div>
+                                    </div>
+                                    <span
+                                        class="material-icons text-slate-300 group-hover:text-indigo-600 transition-colors">open_in_new</span>
+                                </a>
+                                }
+                                @if (selectedClaim()?.document3Path) {
+                                <a [href]="getDocUrl(selectedClaim()?.document3Path!)" target="_blank"
+                                    class="flex items-center justify-between p-4 bg-white border border-slate-200 rounded-2xl hover:border-indigo-300 hover:shadow-lg hover:shadow-indigo-50 transition-all group">
+                                    <div class="flex items-center gap-4">
+                                        <div
+                                            class="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center text-amber-600 transition-colors group-hover:bg-amber-600 group-hover:text-white">
+                                            <span class="material-icons">file_present</span>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-bold text-slate-900">Supporting Document</p>
+                                            <p class="text-[10px] text-slate-400 font-medium">Click to view/download</p>
+                                        </div>
+                                    </div>
+                                    <span
+                                        class="material-icons text-slate-300 group-hover:text-indigo-600 transition-colors">open_in_new</span>
+                                </a>
+                                }
+                                @if (!selectedClaim()?.document1Path && !selectedClaim()?.document2Path &&
+                                !selectedClaim()?.document3Path) {
+                                <div class="p-8 border-2 border-dashed border-slate-100 rounded-3xl text-center">
+                                    <span class="material-icons text-slate-200 !text-4xl mb-2">find_in_page</span>
+                                    <p class="text-sm font-bold text-slate-400 italic">No digital documents provided
+                                        with this claim.</p>
+                                </div>
+                                }
+                            </div>
+                        </section>
+                    </div>
+
+                    <!-- Right Content: Assignment Section -->
+                    <div class="lg:col-span-5 border-l border-slate-100 lg:pl-10 space-y-8">
+                        <section>
+                            <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6">Assign
+                                Officer</h4>
+
+                            @if (successMessage()) {
+                            <div
+                                class="mb-6 p-4 bg-emerald-50 border border-emerald-100 text-emerald-700 rounded-2xl text-sm font-bold animate-in slide-in-from-top-2">
+                                <div class="flex items-center gap-2">
+                                    <span class="material-icons text-base">check_circle</span>
+                                    {{ successMessage() }}
+                                </div>
+                            </div>
+                            }
+                            @if (errorMessage()) {
+                            <div
+                                class="mb-6 p-4 bg-rose-50 border border-rose-100 text-rose-700 rounded-2xl text-sm font-bold animate-in slide-in-from-top-2">
+                                <div class="flex items-center gap-2">
+                                    <span class="material-icons text-base">error_outline</span>
+                                    {{ errorMessage() }}
+                                </div>
+                            </div>
+                            }
+
+                            @if (selectedClaim()?.status === 'SUBMITTED') {
+                            <div class="space-y-4">
+                                <p class="text-xs font-bold text-slate-500 px-1 italic">Select an investigator to handle
+                                    this case:</p>
+                                <div class="space-y-2 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                                    @for (off of workloads(); track off.id) {
+                                    <label
+                                        [class]="'flex items-center justify-between p-4 rounded-[22px] border transition-all cursor-pointer group ' + (selectedOfficerId === off.id ? 'bg-indigo-600 border-indigo-600 shadow-xl shadow-indigo-100 translate-x-1' : 'bg-white border-slate-100 hover:border-indigo-200')">
+                                        <div class="flex items-center gap-3">
+                                            <input type="radio" name="officer" [value]="off.id"
+                                                [(ngModel)]="selectedOfficerId" class="hidden">
+                                            <div
+                                                [class]="'w-10 h-10 rounded-xl flex items-center justify-center font-black transition-colors ' + (selectedOfficerId === off.id ? 'bg-white text-indigo-600 shadow-inner' : 'bg-slate-50 text-slate-400 group-hover:bg-indigo-50 group-hover:text-indigo-600')">
+                                                {{ off.username.charAt(0).toUpperCase() }}
+                                            </div>
+                                            <div>
+                                                <div
+                                                    [class]="'text-sm font-bold tracking-tight ' + (selectedOfficerId === off.id ? 'text-white' : 'text-slate-900')">
+                                                    {{ off.username }}</div>
+                                                <div
+                                                    [class]="'text-[10px] font-medium ' + (selectedOfficerId === off.id ? 'text-indigo-100' : 'text-slate-400')">
+                                                    {{ off.email }}</div>
+                                            </div>
+                                        </div>
+                                        <div class="text-right">
+                                            <div
+                                                [class]="'text-lg font-black leading-none ' + (selectedOfficerId === off.id ? 'text-white' : 'text-indigo-600')">
+                                                {{ off.activeClaimsCount }}</div>
+                                            <div
+                                                [class]="'text-[9px] font-black uppercase mt-1 ' + (selectedOfficerId === off.id ? 'text-indigo-200' : 'text-slate-400')">
+                                                Active</div>
+                                        </div>
+                                    </label>
+                                    }
+                                </div>
+
+                                <button (click)="assignToOfficer()" [disabled]="!selectedOfficerId"
+                                    class="w-full mt-6 px-6 py-4 bg-indigo-600 text-white rounded-2xl text-sm font-black hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-xl shadow-indigo-100 flex items-center justify-center gap-2">
+                                    <span class="material-icons text-base">person_add_alt</span>
+                                    Confirm Assignment
+                                </button>
+                            </div>
+                            } @else {
+                            <div class="p-8 bg-indigo-50/50 rounded-3xl border border-indigo-100/50 text-center">
+                                <div
+                                    class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
+                                    <span class="material-icons text-indigo-600 !text-3xl">verified</span>
+                                </div>
+                                <h5 class="text-sm font-black text-indigo-900 mb-2">Assigned to Officer</h5>
+                                <p class="text-xs font-bold text-indigo-600 uppercase tracking-widest">{{
+                                    selectedClaim()?.claimsOfficerName }}</p>
+                                <p class="text-[11px] text-slate-500 mt-4 leading-relaxed">This claim is currently under
+                                    investigation and cannot be re-assigned from here.</p>
+                            </div>
+                            }
+                        </section>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="p-8 border-t border-slate-50 bg-slate-50/30 flex items-center justify-between">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Administrative Control Panel
+                </p>
+                <button (click)="closeModal()"
+                    class="px-8 py-3 bg-white border border-slate-200 rounded-2x; text-xs font-black text-slate-600 hover:bg-slate-100 transition-all">
+                    Close Panel
+                </button>
+            </div>
+
+        </div>
+    </div>
+    }
+    }
+</div>

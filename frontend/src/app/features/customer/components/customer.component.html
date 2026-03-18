@@ -1,0 +1,93 @@
+<div class="min-h-screen bg-slate-50 flex flex-col font-sans">
+    <!-- Top Navigation Bar -->
+    <header
+        class="h-20 bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm px-4 md:px-8 flex items-center justify-between">
+        <!-- Brand & Logo -->
+        <div class="flex items-center gap-8">
+            <div class="flex items-center gap-3 cursor-pointer group" routerLink="/customer">
+                <div
+                    class="w-10 h-10 bg-gradient-to-br from-indigo-600 to-indigo-800 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-200 group-hover:scale-105 transition-transform duration-300">
+                    <span class="material-icons text-white !text-xl">shield</span>
+                </div>
+                <div>
+                    <h1 class="font-display text-lg font-black text-slate-900 leading-tight">VehicleSure</h1>
+                    <p class="text-[10px] text-indigo-600 font-bold uppercase tracking-[0.2em] leading-none">Customer
+                        Portal</p>
+                </div>
+            </div>
+
+            <!-- Primary Nav Links (Desktop) -->
+            <nav class="hidden md:flex h-full items-center gap-1 ml-4">
+                <ng-container *ngFor="let item of menuItems">
+                    <a [routerLink]="item.route" [routerLinkActive]="'text-indigo-600 after:w-full'"
+                        [routerLinkActiveOptions]="{exact: item.exact}"
+                        class="relative px-5 py-2 text-sm font-bold text-slate-500 hover:text-slate-900 transition-colors after:absolute after:bottom-[-26px] after:left-0 after:h-1 after:bg-indigo-600 after:rounded-t-full after:transition-all after:duration-300 after:w-0">
+                        {{ item.label }}
+                    </a>
+                </ng-container>
+            </nav>
+        </div>
+
+        <!-- Right Side: User & Actions -->
+        <div class="flex items-center gap-4">
+            <!-- Mobile Menu Items (Icons only) -->
+            <nav class="flex md:hidden items-center gap-1 mr-2">
+                <ng-container *ngFor="let item of menuItems">
+                    <a [routerLink]="item.route" [routerLinkActive]="'text-indigo-600 bg-indigo-50'"
+                        [routerLinkActiveOptions]="{exact: item.exact}"
+                        class="p-2 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-slate-50 transition-colors">
+                        <span class="material-icons !text-[20px]">{{ item.icon }}</span>
+                    </a>
+                </ng-container>
+            </nav>
+
+            <!-- Notification System -->
+            <app-notification-icon></app-notification-icon>
+
+            <div class="hidden sm:flex flex-col items-end mr-2">
+                <span class="text-xs font-black text-slate-900 leading-none">{{ authService.username() }}</span>
+                <span class="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-1">Customer</span>
+            </div>
+
+            <!-- Profile Dropdown Trigger -->
+            <div class="relative group">
+                <button
+                    class="w-11 h-11 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-700 font-black shadow-inner border border-indigo-100 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300">
+                    {{ authService.username() ? authService.username().charAt(0).toUpperCase() : 'U' }}
+                </button>
+
+                <!-- Dropdown menu -->
+                <div
+                    class="absolute right-0 top-full pt-2 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-300 w-48">
+                    <div class="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
+                        <div class="px-5 py-3 border-b border-slate-50">
+                            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Signed in as</p>
+                            <p class="text-xs font-bold text-slate-800 truncate">{{ authService.username() }}</p>
+                        </div>
+                        <button (click)="showPasswordModal = true"
+                            class="w-full text-left px-5 py-3 text-xs font-bold text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-2 border-b border-slate-50">
+                            <span class="material-icons text-base">lock_reset</span>
+                            Change Password
+                        </button>
+                        <button (click)="logout()"
+                            class="w-full text-left px-5 py-3 text-xs font-bold text-rose-500 hover:bg-rose-50 transition-colors flex items-center gap-2">
+                            <span class="material-icons text-base">logout</span>
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTENT AREA -->
+    <main class="flex-1 overflow-y-auto w-full">
+        <div class="max-w-[1440px] mx-auto p-4 md:p-10 w-full relative h-full">
+            <router-outlet></router-outlet>
+        </div>
+    </main>
+</div>
+
+@if (showPasswordModal) {
+    <app-change-password-modal (close)="showPasswordModal = false"></app-change-password-modal>
+}

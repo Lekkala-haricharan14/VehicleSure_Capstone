@@ -1,0 +1,223 @@
+<div class="max-w-5xl mx-auto">
+
+    <div *ngIf="isLoading" class="text-center py-20 bg-white rounded-3xl border border-slate-200 shadow-sm">
+        <div class="w-10 h-10 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin mx-auto mb-4">
+        </div>
+        <p class="text-slate-500">Loading your policies...</p>
+    </div>
+
+    <div *ngIf="!isLoading && policies.length === 0"
+        class="text-center py-16 bg-white rounded-3xl border border-slate-200 border-dashed shadow-sm">
+        <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
+            <span class="material-icons text-slate-400 !text-5xl">folder_off</span>
+        </div>
+        <h3 class="text-xl font-bold text-slate-800 mb-2">No policies found</h3>
+        <p class="text-slate-500 max-w-sm mx-auto mb-8">You don't have any active policies yet. Once your application is
+            approved, your policy will appear here.</p>
+        <a routerLink="/buy"
+            class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-xl text-white bg-indigo-600 hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200">
+            Purchase a Policy
+        </a>
+    </div>
+
+    <div *ngIf="!isLoading && policies.length > 0" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div *ngFor="let policy of policies"
+            class="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-all border-l-4 border-l-indigo-600">
+            <div class="flex justify-between items-start mb-2">
+                <div>
+                    <span class="text-[10px] font-black uppercase tracking-widest text-slate-400">Policy Number</span>
+                    <h3 class="text-lg font-bold text-slate-900">{{ policy.policyNumber }}</h3>
+                </div>
+                <div class="flex flex-col items-end gap-2">
+                    <span
+                        [class]="'px-3 py-1 rounded-full text-[10px] font-black border uppercase tracking-wider ' + getStatusClass(policy.status)">
+                        {{ policy.status }}
+                    </span>
+                    <span *ngIf="policy.policyType"
+                        class="px-2 py-0.5 rounded-md text-[9px] font-bold bg-indigo-50 text-indigo-600 border border-indigo-100 uppercase tracking-tight">
+                        {{ policy.policyType }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Plan Overview -->
+            <div class="mb-4">
+                <h4 class="text-sm font-black text-indigo-700 font-display italic">{{ policy.planName }}</h4>
+                <p class="text-[11px] text-slate-500 italic leading-tight mt-1">{{ policy.description }}</p>
+            </div>
+
+            <div class="space-y-4">
+                <div class="flex items-center gap-3 p-3 bg-slate-50 rounded-2xl">
+                    <div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase leading-none mb-1">Vehicle</p>
+                        <p class="font-bold text-slate-800">{{ policy.vehicleRegistrationNumber }}</p>
+                    </div>
+                </div>
+
+                <!-- Coverage Details -->
+                <div class="bg-indigo-50/30 rounded-2xl p-3 border border-indigo-50">
+                    <p class="text-[10px] font-bold text-indigo-400 uppercase mb-3">Coverage Information</p>
+                    <div class="grid grid-cols-2 gap-y-2 gap-x-4">
+                        <div class="flex items-center gap-2">
+                            <span class="material-icons !text-sm" [class.text-emerald-500]="policy.coversThirdParty"
+                                [class.text-slate-300]="!policy.coversThirdParty">
+                                {{ policy.coversThirdParty ? 'check_circle' : 'cancel' }}
+                            </span>
+                            <span class="text-[11px]" [class.text-slate-700]="policy.coversThirdParty"
+                                [class.text-slate-400]="!policy.coversThirdParty">Third Party</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="material-icons !text-sm" [class.text-emerald-500]="policy.coversOwnDamage"
+                                [class.text-slate-300]="!policy.coversOwnDamage">
+                                {{ policy.coversOwnDamage ? 'check_circle' : 'cancel' }}
+                            </span>
+                            <span class="text-[11px]" [class.text-slate-700]="policy.coversOwnDamage"
+                                [class.text-slate-400]="!policy.coversOwnDamage">Own Damage</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="material-icons !text-sm" [class.text-emerald-500]="policy.coversTheft"
+                                [class.text-slate-300]="!policy.coversTheft">
+                                {{ policy.coversTheft ? 'check_circle' : 'cancel' }}
+                            </span>
+                            <span class="text-[11px]" [class.text-slate-700]="policy.coversTheft"
+                                [class.text-slate-400]="!policy.coversTheft">Theft</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="material-icons !text-sm"
+                                [class.text-emerald-500]="policy.coversNaturalDisaster"
+                                [class.text-slate-300]="!policy.coversNaturalDisaster">
+                                {{ policy.coversNaturalDisaster ? 'check_circle' : 'cancel' }}
+                            </span>
+                            <span class="text-[11px]" [class.text-slate-700]="policy.coversNaturalDisaster"
+                                [class.text-slate-400]="!policy.coversNaturalDisaster">Natural Disaster</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-3 pt-3 border-t border-indigo-100/50 grid grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-[9px] font-bold text-slate-400 uppercase">Max Coverage</p>
+                            <p class="text-xs font-bold text-slate-700">{{ policy.maxCoverageAmount |
+                                currency:'INR':'symbol':'1.0-0' }}</p>
+                        </div>
+                        <div>
+                            <p class="text-[9px] font-bold text-slate-400 uppercase">Deductible</p>
+                            <p class="text-xs font-bold text-slate-700">{{ policy.deductibleAmount |
+                                currency:'INR':'symbol':'1.0-0' }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Start Date</p>
+                        <p class="font-medium text-slate-700">{{ policy.startDate | date }}</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">End Date</p>
+                        <p class="font-medium text-slate-700">{{ policy.endDate | date }}</p>
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-slate-100 flex flex-col gap-3">
+                    <div class="flex justify-between items-center">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase">Premium Amount</p>
+                        <p class="text-xl font-black text-indigo-600">{{ policy.premiumAmount |
+                            currency:'INR':'symbol':'1.0-0' }}</p>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <!-- Pay Now button if pending payment -->
+                        <button *ngIf="policy.status === 'PENDING_PAYMENT'" (click)="confirmPayment(policy)"
+                            class="flex-1 px-4 py-2 bg-indigo-600 text-white text-[10px] font-bold rounded-xl hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-indigo-200">
+                            <span class="material-icons !text-xs">account_balance_wallet</span>
+                            Confirm & Pay Now
+                        </button>
+
+                        <!-- Download buttons only if active/paid -->
+                        <ng-container *ngIf="canDownload(policy.status)">
+                            <button (click)="downloadPolicy(policy.policyId)"
+                                class="flex-1 px-4 py-2 bg-slate-900 text-white text-[10px] font-bold rounded-xl hover:bg-slate-800 transition-colors flex items-center justify-center gap-2">
+                                <span class="material-icons !text-xs">description</span>
+                                Policy Doc
+                            </button>
+                            <button (click)="downloadInvoice(policy.policyId)"
+                                class="flex-1 px-4 py-2 bg-indigo-50 text-indigo-600 text-[10px] font-bold rounded-xl hover:bg-indigo-100 transition-colors flex items-center justify-center gap-2 border border-indigo-100">
+                                <span class="material-icons !text-xs">receipt</span>
+                                Invoice
+                            </button>
+                        </ng-container>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==========================================
+     Custom Payment Confirmation Modal 
+     ========================================== -->
+<div *ngIf="showConfirmModal()"
+    class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-[2px] animate-fade-in"
+    (click)="cancelPaymentConfirm()">
+
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-white/20 animate-slide-up"
+        (click)="$event.stopPropagation()">
+
+        <div class="p-8 text-center">
+            <!-- Icon -->
+            <div
+                class="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-full mx-auto mb-6 flex items-center justify-center">
+                <span class="material-icons !text-4xl">account_balance_wallet</span>
+            </div>
+
+            <!-- Title & Description -->
+            <h3 class="text-xl font-black text-slate-900 mb-3 font-display">Confirm Payment</h3>
+            <p class="text-slate-500 text-sm leading-relaxed mb-8">
+                Confirm payment of <span class="font-bold text-slate-900">{{ selectedPolicyForPayment()?.premiumAmount |
+                    currency:'INR':'symbol':'1.0-0' }}</span>
+                for Policy <span class="font-bold text-slate-900">{{ selectedPolicyForPayment()?.policyNumber }}</span>?
+                Your insurance coverage will be activated immediately.
+            </p>
+
+            <!-- Actions -->
+            <div class="flex gap-3">
+                <button (click)="cancelPaymentConfirm()"
+                    class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-xl transition-colors">
+                    Cancel
+                </button>
+                <button (click)="processPaymentConfirm()"
+                    class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-indigo-100 active:scale-95">
+                    Confirm & Pay
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==========================================
+     Success / Error Notifications 
+     ========================================== -->
+<div *ngIf="paymentSuccess()"
+    class="fixed top-8 left-1/2 -translate-x-1/2 z-[100] w-full max-w-sm animate-slide-up-fade">
+    <div class="bg-emerald-600 text-white rounded-2xl shadow-2xl p-4 flex items-center gap-4 border border-emerald-500">
+        <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+            <span class="material-icons text-white !text-2xl">check_circle</span>
+        </div>
+        <p class="text-sm font-bold">{{ paymentSuccess() }}</p>
+        <button (click)="paymentSuccess.set(null)" class="ml-auto opacity-70 hover:opacity-100">
+            <span class="material-icons !text-xl">close</span>
+        </button>
+    </div>
+</div>
+
+<div *ngIf="paymentError()" class="fixed top-8 left-1/2 -translate-x-1/2 z-[100] w-full max-w-sm animate-slide-up-fade">
+    <div class="bg-rose-600 text-white rounded-2xl shadow-2xl p-4 flex items-center gap-4 border border-rose-500">
+        <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+            <span class="material-icons text-white !text-2xl">error</span>
+        </div>
+        <p class="text-sm font-bold">{{ paymentError() }}</p>
+        <button (click)="paymentError.set(null)" class="ml-auto opacity-70 hover:opacity-100">
+            <span class="material-icons !text-xl">close</span>
+        </button>
+    </div>
+</div>

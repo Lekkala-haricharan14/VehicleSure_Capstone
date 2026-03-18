@@ -1,0 +1,327 @@
+<div class="space-y-6">
+
+    <!-- Financial Performance -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div class="bg-indigo-600 rounded-2xl p-6 shadow-xl shadow-indigo-100 relative overflow-hidden group">
+            <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
+                <span class="material-icons !text-[80px]">account_balance_wallet</span>
+            </div>
+            <div class="text-indigo-100 text-xs font-black uppercase tracking-widest mb-1">Total Premium Collected</div>
+            <div class="font-display text-3xl font-black text-white mb-2">{{ financialStats().totalRevenue | currency:'INR':'symbol':'1.0-0' }}</div>
+            <div class="flex items-center gap-2">
+                <span class="text-[10px] bg-white/20 text-white px-2 py-0.5 rounded-full font-bold">PREMIUMS</span>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm border-l-4 border-l-rose-500 group hover:shadow-md transition-all">
+            <div class="flex items-center justify-between mb-2">
+                <div class="text-rose-600 text-xs font-black uppercase tracking-wider">Claims Amount Paid</div>
+                <div class="w-8 h-8 rounded-lg bg-rose-50 flex items-center justify-center text-rose-500">
+                    <span class="material-icons !text-base">money_off</span>
+                </div>
+            </div>
+            <div class="font-display text-3xl font-black text-slate-900">
+                {{ financialStats().totalExpenditure | currency:'INR':'symbol':'1.0-0' }}
+            </div>
+            <div class="text-[10px] text-slate-400 mt-2 font-bold uppercase">Expenditure</div>
+        </div>
+
+        <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm border-l-4 border-l-emerald-500 group hover:shadow-md transition-all">
+            <div class="flex items-center justify-between mb-2">
+                <div class="text-emerald-600 text-xs font-black uppercase tracking-wider">Total Revenue (Net)</div>
+                <div class="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-500">
+                    <span class="material-icons !text-base">trending_up</span>
+                </div>
+            </div>
+            <div class="font-display text-3xl font-black text-slate-900">
+                {{ financialStats().netRevenue | currency:'INR':'symbol':'1.0-0' }}
+            </div>
+            <div class="text-[10px] text-slate-400 mt-2 font-bold uppercase tracking-tighter">Premiums - Claims</div>
+        </div>
+    </div>
+    </div>
+
+    <div class="grid grid-cols-2 xl:grid-cols-5 gap-5">
+        <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
+            <div class="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center text-2xl mb-4">
+                <span class="material-icons text-indigo-600 !text-[24px]">people</span>
+            </div>
+            <div class="font-display text-3xl font-black text-slate-900">{{ dashboardStats().totalStaff }}
+            </div>
+            <div class="text-sm text-slate-500 mt-1">Total Staff</div>
+        </div>
+        <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
+            <div
+                class="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center text-2xl mb-4 border border-indigo-100">
+                <span class="material-icons text-indigo-600 !text-[24px]">person</span>
+            </div>
+            <div class="font-display text-3xl font-black text-slate-900">{{ dashboardStats().underwriters }}
+            </div>
+            <div class="text-sm text-slate-500 mt-1">Underwriters</div>
+        </div>
+        <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
+            <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center text-2xl mb-4">
+                <span class="material-icons text-green-600 !text-[24px]">assignment_turned_in</span>
+            </div>
+            <div class="font-display text-3xl font-black text-slate-900">{{
+                dashboardStats().activePlans }}
+            </div>
+            <div class="text-sm text-slate-500 mt-1">Active Plans</div>
+        </div>
+        <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm group hover:border-amber-200 transition-colors">
+            <div class="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center text-2xl mb-4">
+                <span class="material-icons text-amber-600 !text-[24px]">description</span>
+            </div>
+            <div class="font-display text-3xl font-black text-slate-900">{{
+                dashboardStats().newClaims
+                }}</div>
+            <div class="text-xs font-bold text-slate-400 uppercase tracking-tighter mt-1">New Claims</div>
+        </div>
+        <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
+            <div
+                class="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center text-2xl mb-4 border border-indigo-100 text-indigo-500">
+                <span class="material-icons !text-[24px]">equalizer</span>
+            </div>
+            <div class="font-display text-3xl font-black text-slate-900">{{
+                dashboardStats().totalClaims
+                }}</div>
+            <div class="text-xs font-bold text-slate-400 uppercase tracking-tighter mt-1">Lifetime Claims</div>
+        </div>
+    </div>
+
+    <!-- Claims Flow Funnel -->
+    <div class="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm">
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h3 class="font-display text-lg font-black text-slate-900">Claims Lifecycle Flow</h3>
+                <p class="text-xs text-slate-500 font-medium">Real-time status of all submitted claims in the system</p>
+            </div>
+            <div class="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 rounded-full">
+                <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>
+                <span class="text-[10px] font-black text-indigo-700 uppercase">Live Tracking</span>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 relative">
+            @for (step of claimsFunnel(); track step.label; let last = $last) {
+            <div class="relative group">
+                <div class="flex items-center gap-4 mb-3">
+                    <div [class]="step.color + ' w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-lg transition-transform group-hover:scale-110'">
+                        <span class="material-icons !text-xl">{{ step.icon }}</span>
+                    </div>
+                    <div>
+                        <div class="text-[10px] font-black text-slate-400 uppercase tracking-tighter">{{ step.label }}</div>
+                        <div class="text-2xl font-black text-slate-900">{{ step.count }}</div>
+                    </div>
+                </div>
+                
+                <!-- Progress Visualization -->
+                <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                    <div class="h-full transition-all duration-1000" 
+                        [class]="step.color"
+                        [style.width.%]="financialStats().totalClaims > 0 ? (step.count / financialStats().totalClaims * 100) : 0">
+                    </div>
+                </div>
+
+                @if (!last) {
+                <div class="hidden md:block absolute top-6 -right-2 text-slate-200 z-10 scale-x-[-1]">
+                    <span class="material-icons !text-xl rotate-180">double_arrow</span>
+                </div>
+                }
+            </div>
+            }
+        </div>
+    <!-- Strategic Business Analytics -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Monthly Growth Trends -->
+        <div class="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm transition-all hover:shadow-md">
+            <h3 class="font-display text-lg font-black text-slate-900 mb-8 flex items-center gap-2">
+                <span class="material-icons text-indigo-600">show_chart</span>
+                Growth Highlights (Last 6 Months)
+            </h3>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Revenue Trend -->
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Monthly Revenue</div>
+                            <div class="text-xl font-black text-slate-900">{{ monthlyTrends().currentRevenue | currency:'INR':'symbol':'1.0-0' }}</div>
+                        </div>
+                        <div class="text-emerald-500 flex items-center gap-0.5 font-black text-xs">
+                            <span class="material-icons !text-sm">trending_up</span>
+                        </div>
+                    </div>
+                    <div class="h-16 relative">
+                        <svg class="w-full h-full" viewBox="0 0 200 40" preserveAspectRatio="none">
+                            <path [attr.d]="monthlyTrends().revenuePath" fill="none" stroke="#4f46e5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                    <div class="flex justify-between px-1">
+                        @for (label of monthlyTrends().labels; track label) {
+                            <span class="text-[9px] font-bold text-slate-400 uppercase">{{ label }}</span>
+                        }
+                    </div>
+                </div>
+
+                <!-- Policies Trend -->
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Policies Sold</div>
+                            <div class="text-xl font-black text-slate-900">{{ monthlyTrends().currentPolicies }} Units</div>
+                        </div>
+                        <div class="text-indigo-500 flex items-center gap-0.5 font-black text-xs">
+                            <span class="material-icons !text-sm">auto_graph</span>
+                        </div>
+                    </div>
+                    <div class="h-16 relative">
+                        <svg class="w-full h-full" viewBox="0 0 200 40" preserveAspectRatio="none">
+                            <path [attr.d]="monthlyTrends().policiesPath" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                    <div class="flex justify-between px-1">
+                        @for (label of monthlyTrends().labels; track label) {
+                            <span class="text-[9px] font-bold text-slate-400 uppercase">{{ label }}</span>
+                        }
+                    </div>
+                </div>
+
+                <!-- Claims Trend -->
+                <div class="space-y-4 border-t lg:border-t-0 lg:border-l border-slate-50 pt-4 lg:pt-0 lg:pl-8">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Claims Filed</div>
+                            <div class="text-xl font-black text-slate-900">{{ monthlyTrends().currentClaims }} Files</div>
+                        </div>
+                        <div class="text-rose-500 flex items-center gap-0.5 font-black text-xs">
+                            <span class="material-icons !text-sm">analytics</span>
+                        </div>
+                    </div>
+                    <div class="h-16 relative">
+                        <svg class="w-full h-full" viewBox="0 0 200 40" preserveAspectRatio="none">
+                            <path [attr.d]="monthlyTrends().claimsPath" fill="none" stroke="#f43f5e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                    <div class="flex justify-between px-1">
+                        @for (label of monthlyTrends().labels; track label) {
+                            <span class="text-[9px] font-bold text-slate-400 uppercase">{{ label }}</span>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Category Profitability -->
+        <div class="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm relative overflow-hidden transition-all hover:shadow-md">
+            <h3 class="font-display text-lg font-black text-slate-900 mb-6 flex items-center gap-2">
+                <span class="material-icons text-amber-500">analytics</span>
+                Segment Profitability
+            </h3>
+            
+            <div class="space-y-4 max-h-[280px] overflow-y-auto pr-2 custom-scrollbar">
+                @for (cat of categoryProfitability(); track cat.key) {
+                <div class="group">
+                    <div class="flex items-center justify-between mb-1.5">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-black text-slate-700">{{ cat.label }}</span>
+                            <span [class]="'text-[9px] font-black px-1.5 py-0.5 rounded-full ' + (cat.profit >= 0 ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600')">
+                                {{ cat.profitMargin | number:'1.0-0' }}% Margin
+                            </span>
+                        </div>
+                        <div class="text-[10px] font-bold text-slate-400">
+                            Profit: <span class="text-slate-900 font-black">{{ cat.profit | currency:'INR':'symbol':'1.0-0' }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="relative h-2 w-full bg-slate-100 rounded-full overflow-hidden flex">
+                        <!-- Revenue Bar with dynamic width -->
+                        <div class="h-full bg-indigo-600 shadow-sm transition-all duration-1000"
+                            [style.width.%]="cat.revenue > 0 ? (cat.revenue / (cat.revenue + cat.expenditure) * 100) : 0">
+                        </div>
+                        <!-- Expenditure helper -->
+                        <div class="h-full bg-rose-400/20 transition-all duration-1000"
+                            [style.width.%]="cat.expenditure > 0 ? (cat.expenditure / (cat.revenue + cat.expenditure) * 100) : 0">
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between mt-1 px-1">
+                        <span class="text-[9px] font-black text-indigo-600 uppercase">Rev: {{ cat.revenue | currency:'INR':'symbol':'1.0-0' }}</span>
+                        <span class="text-[9px] font-black text-rose-500 uppercase">Exp: {{ cat.expenditure | currency:'INR':'symbol':'1.0-0' }}</span>
+                    </div>
+                </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
+            <h3 class="font-display text-base font-black text-slate-900 mb-5 flex items-center gap-2">
+                <span class="material-icons text-indigo-500 !text-base">bolt</span>
+                Quick Actions
+            </h3>
+            <div class="grid grid-cols-1 gap-2">
+                <a routerLink="/admin/claims"
+                    class="flex items-center gap-2 bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 hover:bg-slate-900 hover:text-white transition-all text-xs font-bold text-slate-700">
+                    <span class="material-icons text-indigo-500 !text-[18px]">assignment</span>
+                    Manage Claims</a>
+                <a routerLink="/admin/applications"
+                    class="flex items-center gap-2 bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 hover:bg-indigo-600 hover:text-white transition-all text-xs font-bold text-slate-700">
+                    <span class="material-icons text-indigo-500 !text-[18px]">description</span>
+                    View Requests</a>
+                <a routerLink="/admin/plans"
+                    class="flex items-center gap-2 bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 hover:bg-indigo-600 hover:text-white transition-all text-xs font-bold text-slate-700">
+                    <span class="material-icons text-indigo-500 !text-[18px]">add_task</span>
+                    Manage Plans</a>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
+            <h3 class="font-display text-base font-black text-slate-900 mb-5 flex items-center gap-2">
+                <span class="material-icons text-indigo-600 !text-base">receipt_long</span>
+                Recent Activity
+            </h3>
+            <div class="space-y-4">
+                @for (act of recentFinancialActivity(); track $index) {
+                <div class="flex items-center justify-between group">
+                    <div class="flex items-center gap-3">
+                        <div [class]="(act.type === 'INCOME' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600') + ' w-9 h-9 rounded-full flex items-center justify-center transition-colors group-hover:scale-110'">
+                            <span class="material-icons !text-lg">{{ act.icon }}</span>
+                        </div>
+                        <div>
+                            <div class="text-xs font-black text-slate-800">{{ act.label }}</div>
+                            <div class="text-[10px] font-bold text-indigo-600 uppercase">{{ act.subtext }}</div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div [class]="(act.type === 'INCOME' ? 'text-emerald-700' : 'text-rose-700') + ' text-xs font-black'">
+                            {{ (act.type === 'INCOME' ? '+' : '-') }} {{ act.amount | currency:'INR':'symbol':'1.0-0' }}
+                        </div>
+                        <div class="text-[9px] text-slate-400 font-medium">{{ act.date | date:'shortTime' }}</div>
+                    </div>
+                </div>
+                } @empty {
+                <div class="text-center py-10 text-slate-400 italic text-xs">No recent activity</div>
+                }
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
+            <h3 class="font-display text-base font-black text-slate-900 mb-5 flex items-center gap-2">
+                <span class="material-icons text-indigo-600 !text-base">pie_chart</span>
+                Plans by Vehicle Type
+            </h3>
+            <div class="space-y-2 max-h-56 overflow-y-auto pr-1">
+                @for (cat of vehicleCategories; track cat.key) {
+                @if (getPlansCountByVehicle(cat.key) > 0) {
+                <div class="flex items-center justify-between py-2 border-b border-slate-100 last:border-0">
+                    <span class="text-xs text-slate-600 font-bold flex items-center gap-1.5">{{ cat.label }}</span>
+                    <span class="text-[10px] font-black bg-slate-100 text-slate-700 px-3 py-1 rounded-full">{{
+                        getPlansCountByVehicle(cat.key) }}</span>
+                </div>
+                }
+                }
+            </div>
+        </div>
+    </div>
+</div>
